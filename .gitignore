@@ -5,3 +5,5 @@ vars.yaml
 *.tfstate
 terraform.tfplan
 terraform.tfstate.backup
+tests/use-cases/*/*.yaml
+venv
