@@ -37,6 +37,13 @@ render_templates: install_deps
 	@. $(VENV_DIR)/local/bin/activate && $(PYTHON) $(SCRIPT) $(CLUSTER_TYPE)
 	@echo "Templates rendered successfully for cluster type $(CLUSTER_TYPE)."
 
+# Target to run Go tests
+.PHONY: test
+test:
+	@echo "Running Go tests..."
+	@cd tests && go test -v ${CLUSTER_TYPE}_cluster_test.go
+	@echo "Go tests completed."
+
 # Clean target to remove the virtual environment and generated files
 .PHONY: clean
 clean:

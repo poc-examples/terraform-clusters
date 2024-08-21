@@ -47,9 +47,14 @@ func TestRosaCluster(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "../modules/aws-rosa",
 		Vars: map[string]interface{}{
-			"cluster_name": config.Openshift.AWS.ClusterName,
-			"region":       config.Openshift.AWS.Region,
-			"version":      config.Openshift.AWS.Version,
+			"cluster_name":           config.Openshift.AWS.ClusterName,
+			"region":                 config.Openshift.AWS.Region,
+			"rosa_openshift_version": config.Openshift.AWS.Version,
+			"offline_token":          config.Openshift.OfflineToken,
+			"admin_credentials": map[string]string{
+				"username": config.Openshift.Admin.Credentials.Username,
+				"password": config.Openshift.Admin.Credentials.Password,
+			},
 		},
 	}
 
