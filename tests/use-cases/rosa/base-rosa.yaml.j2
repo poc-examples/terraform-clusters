@@ -1,0 +1,22 @@
+{#
+  Template Name: OpenShift ROSA Cluster Configuration
+  Description: This template configures an OpenShift cluster on AWS using ROSA.
+  Variables:
+    - cluster_username: The username for the cluster admin.
+    - cluster_password: The password for the cluster admin. Must be 14+ chars, with upper and lower case, and special characters.
+    - rosa_token: The offline token obtained from the Red Hat OpenShift console.
+  Usage:
+    This template should be rendered with the appropriate variables set in your environment.
+#}
+
+openshift:
+  AWS:
+    type: rosa
+    region: us-east-2
+
+  admin:
+    credentials:
+      username: {{ cluster_username }}
+      password: {{ cluster_password }}
+
+  offline_token: {{ rosa_token }}
