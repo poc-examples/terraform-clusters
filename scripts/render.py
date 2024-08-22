@@ -25,6 +25,13 @@ import os
 import argparse
 from jinja2 import Environment, FileSystemLoader
 
+# Gather environment variables
+variables = {
+    'cluster_username': os.getenv('CLUSTER_USERNAME'),
+    'cluster_password': os.getenv('CLUSTER_PASSWORD'),
+    'rosa_token': os.getenv('ROSA_TOKEN')
+}
+
 def render_template(template_name, output_name, variables):
     """
     Render a Jinja2 template and save the output to a file.
@@ -54,13 +61,6 @@ cluster_type = args.cluster_type
 
 # Directory for use cases based on the cluster type
 use_cases_dir = f'./tests/use-cases/{cluster_type}'
-
-# Gather environment variables
-variables = {
-    'cluster_username': os.getenv('CLUSTER_USERNAME'),
-    'cluster_password': os.getenv('CLUSTER_PASSWORD'),
-    'rosa_token': os.getenv('ROSA_TOKEN')
-}
 
 # Process each .j2 file in the specified use-cases directory
 for filename in os.listdir(use_cases_dir):
