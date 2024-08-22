@@ -1,4 +1,17 @@
 # Makefile for rendering Jinja2 templates using a virtual environment
+SHELL := /bin/bash
+REQUIRED_ENV_VARS := AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY CLUSTER_USERNAME CLUSTER_PASSWORD ROSA_TOKEN
+
+check-shell:
+	@for var in $(REQUIRED_ENV_VARS); do \
+		if [ -z "$${!var}" ]; then \
+			echo "Error: $$var is not set"; \
+			exit 1; \
+		else \
+			echo "$$var is set"; \
+		fi \
+	done
+	@echo "All required environment variables are set."
 
 # Define the Python interpreter to use
 PYTHON := python3
@@ -32,16 +45,16 @@ install_deps: create_venv
 
 # Target to render the templates with the specified cluster type
 .PHONY: render_templates
-render_templates: install_deps
+render_templates: check-shell install_deps
 	@echo "Rendering Jinja2 templates for cluster type $(CLUSTER_TYPE)..."
 	@. $(VENV_DIR)/local/bin/activate && $(PYTHON) $(SCRIPT) $(CLUSTER_TYPE)
 	@echo "Templates rendered successfully for cluster type $(CLUSTER_TYPE)."
 
 # Target to run Go tests
 .PHONY: test
-test:
+test: check-shell
 	@echo "Running Go tests..."
-	@cd tests && go test -v ${CLUSTER_TYPE}_cluster_test.go
+	@cd tests && go test -v ${CLUSTER_TYPE}_cluster_test.go -timeout 2h
 	@echo "Go tests completed."
 
 # Clean target to remove the virtual environment and generated files
