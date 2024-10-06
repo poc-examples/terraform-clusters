@@ -1,11 +1,6 @@
 data "aws_availability_zones" "available" {}
 data "aws_caller_identity" "current" {}
 
-output "account_id" {
-  value = data.aws_caller_identity.current.account_id
-  description = "i dunno"
-}
-
 resource "random_string" "random_name" {
   length           = 6
   special          = false

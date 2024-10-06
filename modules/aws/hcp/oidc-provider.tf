@@ -1,4 +1,3 @@
-# hosted control plane
 module "oidc_config_and_provider_hcp" {
 
   source  = "terraform-redhat/rosa-hcp/rhcs//modules/oidc-config-and-provider"

@@ -8,7 +8,6 @@ resource "aws_vpc" "this" {
   }
 }
 
-# Create public subnets
 resource "aws_subnet" "public_subnets" {
   count = var.subnet_count
 
@@ -21,7 +20,6 @@ resource "aws_subnet" "public_subnets" {
   }
 }
 
-# Create private subnets
 resource "aws_subnet" "private_subnets" {
   count = var.subnet_count
 
@@ -34,7 +32,6 @@ resource "aws_subnet" "private_subnets" {
   }
 }
 
-# Create an Internet Gateway for the public subnets
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -43,7 +40,6 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-# Create a route table for public subnets
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -57,15 +53,11 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Associate the public subnets with the public route table
 resource "aws_route_table_association" "public_subnets" {
   count          = var.subnet_count
   subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.public.id
 }
-
-# Optionally, create a NAT Gateway and route table for private subnets if they need internet access
-# This example assumes you need private subnets to access the internet for updates, etc.
 
 resource "aws_nat_gateway" "this" {
   count                   = 1
@@ -99,8 +91,6 @@ resource "aws_route_table" "private" {
   }
 }
 
-
-# Associate the private subnets with the private route table
 resource "aws_route_table_association" "private_subnets" {
   count          = var.subnet_count
   subnet_id      = aws_subnet.private_subnets[count.index].id

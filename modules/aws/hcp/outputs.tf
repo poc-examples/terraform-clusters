@@ -1,3 +1,7 @@
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+  description = "The id of the current account"
+}
 
 output "api_url" {
   value       = rhcs_cluster_rosa_hcp.rosa_sts_cluster.api_url
