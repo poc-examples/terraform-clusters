@@ -18,7 +18,7 @@ data "azuread_application" "cluster" {
 }
 
 data "azuread_service_principal" "cluster" {
-  client_id = azuread_application.cluster.client_id
+  client_id = data.azuread_application.cluster.client_id
 }
 
 data "azuread_service_principal" "redhatopenshift" {
