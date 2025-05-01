@@ -18,7 +18,6 @@ resource "terraform_data" "aro_permission_wait" {
   depends_on = [
     azurerm_subnet.control_plane_subnet,
     azurerm_subnet.firewall_subnet,
-    azurerm_subnet.jumphost-subnet,
     azurerm_subnet.machine_subnet,
     azurerm_subnet.private_endpoint_subnet,
     azurerm_route_table.firewall_rt,
