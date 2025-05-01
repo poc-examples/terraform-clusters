@@ -13,12 +13,8 @@ data "azurerm_client_config" "cluster" {}
 
 data "azuread_client_config" "cluster" {}
 
-resource "azuread_application" "cluster" {
-    display_name = "aro-${local.domain}"
-}
-
-resource "azuread_service_principal" "cluster" {
-    client_id = azuread_application.cluster.client_id
+data "azuread_application" "cluster" {
+    display_name = "api://openenv-xjfl9"
 }
 
 data "azuread_service_principal" "redhatopenshift" {
