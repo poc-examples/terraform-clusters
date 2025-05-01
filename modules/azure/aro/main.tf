@@ -31,7 +31,7 @@ data "azuread_service_principal" "redhatopenshift" {
 }
 
 output "console_url" {
-  value = "stuff
+  value = "stuff"
 }
 
 output "domain" {
