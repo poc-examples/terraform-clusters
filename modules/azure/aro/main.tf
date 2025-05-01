@@ -18,16 +18,16 @@ data "azuread_application" "example" {
 }
 
 data "azuread_service_principal" "example" {
-  client_id = data.azuread_application.client_id
-}
-
-data "azuread_service_principal_password" "example" {
-  service_principal_id = data.azuread_service_principal.example.object_id
+  client_id = data.azuread_application.example.client_id
 }
 
 data "azuread_service_principal" "redhatopenshift" {
   // This is the Azure Red Hat OpenShift RP service principal id, do NOT delete it
   client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
+}
+
+output "api_url" {
+  value = "stuff"
 }
 
 output "console_url" {
