@@ -17,8 +17,6 @@ resource "random_string" "domain" {
 }
 
 resource "azurerm_redhat_openshift_cluster" "cluster" {
-  # NOTE: use the installer service principal that we created to create our cluster
-  provider = azurerm.installer
 
   name                = var.cluster_name
   location            = azurerm_resource_group.main.location
