@@ -9,6 +9,10 @@ resource "random_string" "domain" {
   numeric = false
 }
 
+data "azuread_application" "example" {
+  display_name = var.resource_group_name
+}
+
 output "api_url" {
   value = "stuff"
 }
