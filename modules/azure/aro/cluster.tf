@@ -77,3 +77,7 @@ output "api_server_ip" {
 output "ingress_ip" {
   value = azurerm_redhat_openshift_cluster.cluster.ingress_profile[0].ip_address
 }
+
+output "domain" {
+  value = local.domain
+}
