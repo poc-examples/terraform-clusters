@@ -150,6 +150,11 @@ variable "outbound_type" {
   }
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID (needed with the new Auth method)"
+}
+
 # NOTE: this is a required input as per the new ARO provider
 #       https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redhat_openshift_cluster
 variable "domain" {
@@ -200,4 +205,10 @@ variable "worker_node_count" {
     condition     = var.worker_node_count >= 3
     error_message = "Invalid 'worker_node_count'. Minimum of 3."
   }
+}
+
+variable "apply_restricted_policies" {
+  type        = bool
+  default     = false
+  description = "Apply further restricted Azure Policy to further restrict permissions for identities."
 }

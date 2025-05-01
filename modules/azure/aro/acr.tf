@@ -1,3 +1,6 @@
+# Azure Container Registry (ACR) in Private ARO Clusters
+# https://learn.microsoft.com/en-us/azure/container-registry/container-registry-private-link
+
 resource "azurerm_subnet" "private_endpoint_subnet" {
   count                                     = var.acr_private ? 1 : 0
   name                                      = "PrivateEndpoint-subnet"
