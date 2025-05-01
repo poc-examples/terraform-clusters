@@ -9,18 +9,6 @@ resource "random_string" "domain" {
   numeric = false
 }
 
-data "azurerm_client_config" "example" {}
-
-data "azuread_client_config" "example" {}
-
-data "azuread_application" "example" {
-  display_name = var.cluster_name
-}
-
-data "azuread_service_principal" "example" {
-  client_id = data.azuread_application.example.client_id
-}
-
 data "azuread_service_principal" "redhatopenshift" {
   // This is the Azure Red Hat OpenShift RP service principal id, do NOT delete it
   client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
