@@ -17,6 +17,10 @@ data "azuread_application" "cluster" {
     display_name = "api://openenv-xjfl9"
 }
 
+data "azuread_service_principal" "cluster" {
+  client_id = azuread_application.cluster.client_id
+}
+
 data "azuread_service_principal" "redhatopenshift" {
   // This is the Azure Red Hat OpenShift RP service principal id
   client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
