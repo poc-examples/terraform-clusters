@@ -111,8 +111,8 @@ resource "azurerm_redhat_openshift_cluster" "example" {
   }
 
   depends_on = [
-    "azurerm_role_assignment.role_network1",
-    "azurerm_role_assignment.role_network2",
+    azurerm_role_assignment.role_network1,
+    azurerm_role_assignment.role_network2,
   ]
 }
 
