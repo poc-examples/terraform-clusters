@@ -18,7 +18,11 @@ data "azuread_application" "cluster" {
 }
 
 data "azuread_service_principal" "cluster" {
-  client_id = data.azuread_application.cluster.client_id
+    client_id = data.azuread_application.cluster.client_id
+}
+
+resource "azuread_service_principal_password" "example" {
+    service_principal_id = data.azuread_service_principal.cluster.object_id
 }
 
 data "azuread_service_principal" "redhatopenshift" {
