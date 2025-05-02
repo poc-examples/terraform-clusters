@@ -72,6 +72,7 @@ resource "azurerm_redhat_openshift_cluster" "cluster" {
     resource_group_name = data.azurerm_resource_group.cluster.name
 
     cluster_profile {
+        domain          = local.domain
         pull_secret     = local.pull_secret
         version         = "4.16.30"
     }
