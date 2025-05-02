@@ -21,13 +21,36 @@ data "azuread_service_principal" "cluster" {
     client_id = data.azuread_application.cluster.client_id
 }
 
-resource "azuread_service_principal_password" "cluster" {
-    service_principal_id = data.azuread_service_principal.cluster.id
+data "azuread_service_principal" "redhatopenshift" {
+    // This is the Azure Red Hat OpenShift RP service principal id
+    client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
 }
 
-data "azuread_service_principal" "redhatopenshift" {
-  // This is the Azure Red Hat OpenShift RP service principal id
-  client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
+
+
+// START
+data "azurerm_resource_group" "cluster" {
+    name     = var.resource_group_name
+    location = var.location
+}
+
+resource "azurerm_virtual_network" "network" {
+    name                = "${var.cluster_name}-vnet"
+    address_space       = ["10.0.0.0/22"]
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+}
+
+resource "azurerm_role_assignment" "role_network1" {
+    scope                = azurerm_virtual_network.network.id
+    role_definition_name = "Network Contributor"
+    principal_id         = data.azuread_service_principal.cluster.object_id
+}
+
+resource "azurerm_role_assignment" "role_network2" {
+    scope                = azurerm_virtual_network.network.id
+    role_definition_name = "Network Contributor"
+    principal_id         = data.azuread_service_principal.redhatopenshift.object_id
 }
 
 output "api_url" {
@@ -40,8 +63,4 @@ output "console_url" {
 
 output "domain" {
     value = local.domain
-}
-
-output "service_principal_id" {
-    value = data.azuread_service_principal.cluster.object_id
 }
