@@ -66,7 +66,7 @@ resource "azurerm_subnet" "worker_subnet" {
     service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
 }
 
-resource "azurerm_redhat_openshift_cluster" "example" {
+resource "azurerm_redhat_openshift_cluster" "cluster" {
     name                = var.cluster_name
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
