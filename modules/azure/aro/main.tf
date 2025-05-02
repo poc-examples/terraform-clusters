@@ -114,7 +114,7 @@ resource "azurerm_redhat_openshift_cluster" "cluster" {
 }
 
 output "api_url" {
-    value = azurerm_redhat_openshift_cluster.cluster.api_server_profile.url
+    value = azurerm_redhat_openshift_cluster.cluster.api_server_profile[0].url
 }
 
 output "console_url" {
