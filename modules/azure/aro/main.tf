@@ -26,9 +26,6 @@ data "azuread_service_principal" "redhatopenshift" {
     client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
 }
 
-
-
-// START
 data "azurerm_resource_group" "cluster" {
     name     = var.resource_group_name
 }
@@ -50,6 +47,25 @@ resource "azurerm_role_assignment" "role_network2" {
     scope                = azurerm_virtual_network.network.id
     role_definition_name = "Network Contributor"
     principal_id         = data.azuread_service_principal.redhatopenshift.object_id
+}
+
+
+
+// START
+resource "azurerm_subnet" "main_subnet" {
+  name                 = "main-subnet"
+  resource_group_name  = data.azurerm_resource_group.cluster.name
+  virtual_network_name = azurerm_virtual_network.network.name
+  address_prefixes     = ["10.0.0.0/23"]
+  service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+}
+
+resource "azurerm_subnet" "worker_subnet" {
+  name                 = "worker-subnet"
+  resource_group_name  = data.azurerm_resource_group.cluster.name
+  virtual_network_name = azurerm_virtual_network.network.name
+  address_prefixes     = ["10.0.2.0/23"]
+  service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
 }
 
 output "api_url" {
