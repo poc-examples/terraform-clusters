@@ -72,7 +72,7 @@ resource "azurerm_redhat_openshift_cluster" "example" {
 
     cluster_profile {
         domain  = local.domain
-        version = "4.13.23"
+        version = "4.16.30"
     }
 
     network_profile {
@@ -106,8 +106,8 @@ resource "azurerm_redhat_openshift_cluster" "example" {
     }
 
     depends_on = [
-        "azurerm_role_assignment.role_network1",
-        "azurerm_role_assignment.role_network2",
+        azurerm_role_assignment.role_network1,
+        azurerm_role_assignment.role_network2,
     ]
 }
 
