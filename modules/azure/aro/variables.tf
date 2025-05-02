@@ -118,6 +118,14 @@ variable "pull_secret_path" {
   EOF
 }
 
+variable "pull_secret" {
+  type        = string
+  default     = null 
+  description = <<EOF
+  Pull Secret provided from config file
+  EOF
+}
+
 variable "aro_version" {
   type        = string
   description = <<EOF
