@@ -1,5 +1,6 @@
 locals {
     domain = var.domain != null && var.domain != "" ? var.domain : random_string.domain.result
+    pull_secret = var.pull_secret_path != null && var.pull_secret_path != "" ? file(var.pull_secret_path) : null
 }
 
 resource "random_string" "domain" {
@@ -71,8 +72,8 @@ resource "azurerm_redhat_openshift_cluster" "example" {
     resource_group_name = data.azurerm_resource_group.cluster.name
 
     cluster_profile {
-        domain  = local.domain
-        version = "4.16.30"
+        pull_secret     = local.pull_secret
+        version         = "4.16.30"
     }
 
     network_profile {
@@ -112,13 +113,13 @@ resource "azurerm_redhat_openshift_cluster" "example" {
 }
 
 output "api_url" {
-    value = "stuff"
+    value = azurerm_redhat_openshift_cluster.cluster.api_server_profile.url
 }
 
 output "console_url" {
-    value = "stuff"
+    value = azurerm_redhat_openshift_cluster.cluster.console_url
 }
 
 output "domain" {
-    value = local.domain
+    value = "${local.domain}.${var.location}.aroapp.io"
 }
