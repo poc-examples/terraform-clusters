@@ -49,23 +49,66 @@ resource "azurerm_role_assignment" "role_network2" {
     principal_id         = data.azuread_service_principal.redhatopenshift.object_id
 }
 
-
-
-// START
 resource "azurerm_subnet" "main_subnet" {
-  name                 = "main-subnet"
-  resource_group_name  = data.azurerm_resource_group.cluster.name
-  virtual_network_name = azurerm_virtual_network.network.name
-  address_prefixes     = ["10.0.0.0/23"]
-  service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+    name                 = "main-subnet"
+    resource_group_name  = data.azurerm_resource_group.cluster.name
+    virtual_network_name = azurerm_virtual_network.network.name
+    address_prefixes     = ["10.0.0.0/23"]
+    service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
 }
 
 resource "azurerm_subnet" "worker_subnet" {
-  name                 = "worker-subnet"
-  resource_group_name  = data.azurerm_resource_group.cluster.name
-  virtual_network_name = azurerm_virtual_network.network.name
-  address_prefixes     = ["10.0.2.0/23"]
-  service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+    name                 = "worker-subnet"
+    resource_group_name  = data.azurerm_resource_group.cluster.name
+    virtual_network_name = azurerm_virtual_network.network.name
+    address_prefixes     = ["10.0.2.0/23"]
+    service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+}
+
+resource "azurerm_redhat_openshift_cluster" "example" {
+    name                = var.cluster_name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+
+    cluster_profile {
+        domain  = local.domain
+        version = "4.13.23"
+    }
+
+    network_profile {
+        pod_cidr     = "10.128.0.0/14"
+        service_cidr = "172.30.0.0/16"
+    }
+
+    main_profile {
+        vm_size   = "Standard_D8s_v3"
+        subnet_id = azurerm_subnet.main_subnet.id
+    }
+
+    api_server_profile {
+        visibility = "Public"
+    }
+
+    ingress_profile {
+        visibility = "Public"
+    }
+
+    worker_profile {
+        vm_size      = "Standard_D4s_v3"
+        disk_size_gb = 128
+        node_count   = var.worker_node_count
+        subnet_id    = azurerm_subnet.worker_subnet.id
+    }
+
+    service_principal {
+        client_id     = data.azuread_application.cluster.client_id
+        client_secret = var.client_secret
+    }
+
+    depends_on = [
+        "azurerm_role_assignment.role_network1",
+        "azurerm_role_assignment.role_network2",
+    ]
 }
 
 output "api_url" {

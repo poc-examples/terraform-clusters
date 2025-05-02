@@ -155,6 +155,11 @@ variable "subscription_id" {
   description = "Azure Subscription ID (needed with the new Auth method)"
 }
 
+variable "client_secret" {
+  type        = string
+  description = "Azure Subscription ID (needed with the new Auth method)"
+}
+
 # NOTE: this is a required input as per the new ARO provider
 #       https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redhat_openshift_cluster
 variable "domain" {
