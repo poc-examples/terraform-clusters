@@ -15,7 +15,7 @@ data "azurerm_client_config" "cluster" {}
 data "azuread_client_config" "cluster" {}
 
 data "azuread_application" "cluster" {
-    display_name = "api://openenv-xjfl9"
+    display_name = "api://${var.resource_group_name}"
 }
 
 data "azuread_service_principal" "cluster" {
