@@ -1,36 +1,6 @@
-# locals {
-#     domain = var.domain != null && var.domain != "" ? var.domain : random_string.domain.result
-#     pull_secret = var.pull_secret_path != null && var.pull_secret_path != "" ? file(var.pull_secret_path) : null
-# }
-
-# resource "random_string" "domain" {
-#     length  = 8
-#     special = false
-#     upper   = false
-#     numeric = false
-# }
-
-# data "azurerm_client_config" "cluster" {}
-
-# data "azuread_client_config" "cluster" {}
-
-# data "azuread_application" "cluster" {
-#     display_name = "api://${var.resource_group_name}"
-# }
-
-# data "azuread_service_principal" "cluster" {
-#     client_id = data.azuread_application.cluster.client_id
-# }
-
-# data "azuread_service_principal" "redhatopenshift" {
-#     // This is the Azure Red Hat OpenShift RP service principal id
-#     client_id = "f1dd0a37-89c6-4e07-bcd1-ffd3d43d8875"
-# }
-
-# provider "azurerm" {
-#   features {}
-# }
-
+###############
+## START
+###############
 data "azurerm_resource_group" "cluster" {
     name     = var.resource_group_name
 }
@@ -453,8 +423,6 @@ resource "azurerm_private_dns_a_record" "api_int" {
 # ---------------------------
 # Storage for Ignition Configs
 # ---------------------------
-
-
 resource "time_static" "now" {}
 
 resource "azurerm_storage_account" "ign" {
@@ -513,8 +481,6 @@ data "azurerm_storage_account_sas" "ign_ro" {
   # signed_version = "2020-08-04"
 }
 
-
-
 locals {
     ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
     bootstrap_url  = "${local.ign_base}/bootstrap.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
@@ -557,19 +523,15 @@ variable "worker_count" {
     default = 3 
 }
 
-# locals {
-#     ign_replace = "{\"ignition\":{\"version\":\"3.2.0\",\"config\":{\"replace\":{\"source\":\"%s\"}}}}"
-
-#     bootstrap_custom_data = format(local.ign_replace, local.bootstrap_url)
-#     master_custom_data    = format(local.ign_replace, local.master_url)
-#     worker_custom_data    = format(local.ign_replace, local.worker_url)
-# }
-
 locals {
     rhcos_publisher = "redhat"
     rhcos_offer     = "rh-ocp-worker"
     rhcos_sku       = "rh-ocp-worker"
     rhcos_version   = "latest"
+}
+
+locals {
+    ssh_pubkey = file("/home/cengleby/.ssh/id_rsa.pub")
 }
 
 ##
@@ -599,6 +561,11 @@ resource "azurerm_linux_virtual_machine" "bootstrap" {
         offer     = local.rhcos_offer
         sku       = local.rhcos_sku
         version   = local.rhcos_version
+    }
+
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
     }
 
     custom_data = local.bootstrap_custom_data
@@ -641,6 +608,11 @@ resource "azurerm_linux_virtual_machine" "master" {
         version   = local.rhcos_version
     }
 
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
+    }
+
     custom_data = local.master_custom_data
 
     os_disk {
@@ -679,6 +651,11 @@ resource "azurerm_linux_virtual_machine" "worker" {
         offer     = local.rhcos_offer
         sku       = local.rhcos_sku
         version   = local.rhcos_version
+    }
+
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
     }
 
     custom_data = local.worker_custom_data
