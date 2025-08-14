@@ -426,7 +426,7 @@ resource "azurerm_private_dns_a_record" "api_int" {
 resource "time_static" "now" {}
 
 resource "azurerm_storage_account" "ign" {
-    name                     = substr(lower(replace("${var.cluster_name}ignservicecbe}", "/[^a-z0-9]/", "")), 0, 24)
+    name                     = substr(lower(replace("${var.cluster_name}ignservicecbe", "/[^a-z0-9]/", "")), 0, 24)
     resource_group_name      = data.azurerm_resource_group.cluster.name
     location                 = data.azurerm_resource_group.cluster.location
     account_tier             = "Standard"
@@ -523,6 +523,13 @@ variable "worker_count" {
     default = 3 
 }
 
+resource "azurerm_marketplace_agreement" "rhcos" {
+    publisher = "redhat"
+    offer     = "rh-ocp-worker"
+    plan      = "rh-ocp-worker"
+    accepted  = true
+}
+
 locals {
     rhcos_publisher = "redhat"
     rhcos_offer     = "rh-ocp-worker"
@@ -552,7 +559,7 @@ resource "azurerm_linux_virtual_machine" "bootstrap" {
     name                = "${var.cluster_name}-vm-bootstrap"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D4s_v3"
+    size                = "Standard_D8s_v3"
     admin_username      = "core"
     network_interface_ids = [azurerm_network_interface.bootstrap.id]
 
@@ -566,6 +573,12 @@ resource "azurerm_linux_virtual_machine" "bootstrap" {
     admin_ssh_key {
         username   = "core"
         public_key = local.ssh_pubkey
+    }
+
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
     }
 
     custom_data = local.bootstrap_custom_data
@@ -597,7 +610,7 @@ resource "azurerm_linux_virtual_machine" "master" {
     name                = "${var.cluster_name}-vm-master-${count.index}"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D8s_v5"
+    size                = "Standard_D8s_v3"
     admin_username      = "core"
     network_interface_ids = [azurerm_network_interface.master[count.index].id]
 
@@ -611,6 +624,12 @@ resource "azurerm_linux_virtual_machine" "master" {
     admin_ssh_key {
         username   = "core"
         public_key = local.ssh_pubkey
+    }
+
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
     }
 
     custom_data = local.master_custom_data
@@ -642,7 +661,7 @@ resource "azurerm_linux_virtual_machine" "worker" {
     name                = "${var.cluster_name}-vm-worker-${count.index}"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D8s_v5"
+    size                = "Standard_D8s_v3"
     admin_username      = "core"
     network_interface_ids = [azurerm_network_interface.worker[count.index].id]
 
@@ -656,6 +675,12 @@ resource "azurerm_linux_virtual_machine" "worker" {
     admin_ssh_key {
         username   = "core"
         public_key = local.ssh_pubkey
+    }
+
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
     }
 
     custom_data = local.worker_custom_data
