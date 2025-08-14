@@ -392,7 +392,7 @@ resource "azurerm_lb_rule" "rule_mcs_22623" {
 }
 
 # --------------------------
-# (Optional) DNS
+# Public DNS
 # --------------------------
 resource "azurerm_dns_zone" "zone" {
     name                = "objectworksit.com"
@@ -418,4 +418,33 @@ resource "azurerm_dns_a_record" "apps_wildcard" {
     ttl                 = 60
     records             = [azurerm_public_ip.public_ip_ingress.ip_address]
     tags                = var.tags
+}
+
+
+# --------------------------
+# Private DNS for api-int
+# --------------------------
+resource "azurerm_private_dns_zone" "base" {
+  name                = "objectworksit.com"
+  resource_group_name = data.azurerm_resource_group.cluster.name
+  tags                = var.tags
+}
+
+# Link the private zone to the cluster VNet so VMs resolve it
+resource "azurerm_private_dns_zone_virtual_network_link" "base_link" {
+  name                  = "${var.cluster_name}-privdns-link"
+  resource_group_name   = data.azurerm_resource_group.cluster.name
+  private_dns_zone_name = azurerm_private_dns_zone.base.name
+  virtual_network_id    = azurerm_virtual_network.network.id
+  registration_enabled  = false
+}
+
+# api-int.<cluster>.objectworksit.com -> Internal API LB IP
+resource "azurerm_private_dns_a_record" "api_int" {
+  name                = "api-int.${var.cluster_name}"
+  zone_name           = azurerm_private_dns_zone.base.name
+  resource_group_name = data.azurerm_resource_group.cluster.name
+  ttl                 = 60
+  records             = [var.api_int_lb_ip]
+  tags                = var.tags
 }
