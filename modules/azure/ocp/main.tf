@@ -479,17 +479,36 @@ data "azurerm_storage_account_sas" "ign_ro" {
   connection_string = azurerm_storage_account.ign.primary_connection_string
   https_only        = true
 
-  # Start a bit in the past to avoid clock skew
+  # start a bit in the past to avoid clock skew
   start  = timeadd(time_static.now.rfc3339, "-15m")
   expiry = timeadd(time_static.now.rfc3339, "168h") # 7 days
 
-  # Old schema: use single-letter strings (no nested blocks)
-  services       = "b"      # blob only
-  resource_types = "sco"    # service, container, object
-  permissions    = "rl"     # read + list
+  services {
+    blob  = true
+    queue = false
+    table = false
+    file  = false
+  }
 
-  # Pin a known API version to avoid provider quirks
-  signed_version = "2020-08-04"
+  resource_types {
+    service   = true
+    container = true
+    object    = true
+  }
+
+  permissions {
+    read    = true
+    write   = false
+    delete  = false
+    list    = true
+    add     = false
+    create  = false
+    update  = false
+    process = false
+  }
+
+  # Optional but harmless to pin:
+  # signed_version = "2020-08-04"
 }
 
 
