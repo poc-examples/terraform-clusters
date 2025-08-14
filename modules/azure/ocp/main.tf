@@ -586,6 +586,7 @@ resource "azurerm_linux_virtual_machine" "bootstrap" {
         name                 = "${var.cluster_name}-os-bootstrap"
         caching              = "ReadWrite"
         storage_account_type = "Premium_LRS"
+        disk_size_gb         = "1000"
     }
 }
 
