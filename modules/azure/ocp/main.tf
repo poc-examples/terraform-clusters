@@ -227,8 +227,8 @@ resource "azurerm_public_ip" "public_ip_ingress" {
 # Public API LB (6443)
 resource "azurerm_lb" "lb_api_public" {
     name                = "${var.cluster_name}-lb-api-public"
-    location            = data.azurerm_resource_group.location
-    resource_group_name = data.azurerm_resource_group.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
     tags                = var.tags
 
@@ -270,8 +270,8 @@ resource "azurerm_lb_rule" "rule_api_6443" {
 # Public Ingress LB (80/443)
 resource "azurerm_lb" "lb_ingress_public" {
     name                = "${var.cluster_name}-lb-ingress-public"
-    location            = data.azurerm_resource_group.location
-    resource_group_name = data.azurerm_resource_group.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
     tags                = var.tags
 
