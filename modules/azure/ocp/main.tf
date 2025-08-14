@@ -604,41 +604,41 @@ resource "azurerm_network_interface" "master" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "master" {
-    count               = var.master_count
-    name                = "${var.cluster_name}-vm-master-${count.index}"
-    location            = data.azurerm_resource_group.cluster.location
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D8s_v3"
-    admin_username      = "core"
-    network_interface_ids = [azurerm_network_interface.master[count.index].id]
+# resource "azurerm_linux_virtual_machine" "master" {
+#     count               = var.master_count
+#     name                = "${var.cluster_name}-vm-master-${count.index}"
+#     location            = data.azurerm_resource_group.cluster.location
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     size                = "Standard_D8s_v3"
+#     admin_username      = "core"
+#     network_interface_ids = [azurerm_network_interface.master[count.index].id]
 
-    source_image_reference {
-        publisher = local.rhcos_publisher
-        offer     = local.rhcos_offer
-        sku       = local.rhcos_sku
-        version   = local.rhcos_version
-    }
+#     source_image_reference {
+#         publisher = local.rhcos_publisher
+#         offer     = local.rhcos_offer
+#         sku       = local.rhcos_sku
+#         version   = local.rhcos_version
+#     }
 
-    admin_ssh_key {
-        username   = "core"
-        public_key = local.ssh_pubkey
-    }
+#     admin_ssh_key {
+#         username   = "core"
+#         public_key = local.ssh_pubkey
+#     }
 
-    plan {
-        name      = "rh-ocp-worker"
-        product   = "rh-ocp-worker"
-        publisher = "redhat"
-    }
+#     plan {
+#         name      = "rh-ocp-worker"
+#         product   = "rh-ocp-worker"
+#         publisher = "redhat"
+#     }
 
-    custom_data = local.master_custom_data
+#     custom_data = local.master_custom_data
 
-    os_disk {
-        name                 = "${var.cluster_name}-os-master-${count.index}"
-        caching              = "ReadWrite"
-        storage_account_type = "Premium_LRS"
-    }
-}
+#     os_disk {
+#         name                 = "${var.cluster_name}-os-master-${count.index}"
+#         caching              = "ReadWrite"
+#         storage_account_type = "Premium_LRS"
+#     }
+# }
 
 #
 # Workers
@@ -655,41 +655,41 @@ resource "azurerm_network_interface" "worker" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "worker" {
-    count               = var.worker_count
-    name                = "${var.cluster_name}-vm-worker-${count.index}"
-    location            = data.azurerm_resource_group.cluster.location
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D8s_v3"
-    admin_username      = "core"
-    network_interface_ids = [azurerm_network_interface.worker[count.index].id]
+# resource "azurerm_linux_virtual_machine" "worker" {
+#     count               = var.worker_count
+#     name                = "${var.cluster_name}-vm-worker-${count.index}"
+#     location            = data.azurerm_resource_group.cluster.location
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     size                = "Standard_D8s_v3"
+#     admin_username      = "core"
+#     network_interface_ids = [azurerm_network_interface.worker[count.index].id]
 
-    source_image_reference {
-        publisher = local.rhcos_publisher
-        offer     = local.rhcos_offer
-        sku       = local.rhcos_sku
-        version   = local.rhcos_version
-    }
+#     source_image_reference {
+#         publisher = local.rhcos_publisher
+#         offer     = local.rhcos_offer
+#         sku       = local.rhcos_sku
+#         version   = local.rhcos_version
+#     }
 
-    admin_ssh_key {
-        username   = "core"
-        public_key = local.ssh_pubkey
-    }
+#     admin_ssh_key {
+#         username   = "core"
+#         public_key = local.ssh_pubkey
+#     }
 
-    plan {
-        name      = "rh-ocp-worker"
-        product   = "rh-ocp-worker"
-        publisher = "redhat"
-    }
+#     plan {
+#         name      = "rh-ocp-worker"
+#         product   = "rh-ocp-worker"
+#         publisher = "redhat"
+#     }
 
-    custom_data = local.worker_custom_data
+#     custom_data = local.worker_custom_data
 
-    os_disk {
-        name                 = "${var.cluster_name}-os-worker-${count.index}"
-        caching              = "ReadWrite"
-        storage_account_type = "Premium_LRS"
-    }
-}
+#     os_disk {
+#         name                 = "${var.cluster_name}-os-worker-${count.index}"
+#         caching              = "ReadWrite"
+#         storage_account_type = "Premium_LRS"
+#     }
+# }
 
 #
 # ip pool associations
