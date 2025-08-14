@@ -527,7 +527,6 @@ resource "azurerm_marketplace_agreement" "rhcos" {
     publisher = "redhat"
     offer     = "rh-ocp-worker"
     plan      = "rh-ocp-worker"
-    accepted  = true
 }
 
 locals {
