@@ -531,7 +531,7 @@ locals {
 }
 
 locals {
-    ssh_pubkey = file("/home/cengleby/.ssh/id_rsa.pub")
+    ssh_pubkey = file("/usr/src/app/terraform/id_rsa.pub")
 }
 
 ##
