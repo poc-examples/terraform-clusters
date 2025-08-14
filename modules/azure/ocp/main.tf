@@ -56,7 +56,18 @@ resource "azurerm_network_security_group" "control_plane" {
                 source_address_prefix      = "VirtualNetwork"
                 destination_address_prefix = "VirtualNetwork"
             },
-            # API 6443 (internal/external LBs)
+            # SSH 22
+            {
+                name                   = "allow-ssh-22"
+                priority               = 130
+                direction              = "Inbound"
+                access                 = "Allow"
+                protocol               = "Tcp"
+                source_port_range      = "*"
+                destination_port_range = "22"
+                source_address_prefix  = "*"
+                destination_address_prefix = "*"
+            },
             {
                 name                   = "allow-api-6443"
                 priority               = 110
