@@ -522,6 +522,29 @@ locals {
     worker_url     = "${local.ign_base}/worker.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
 }
 
+locals {
+    bootstrap_custom_data = base64encode(jsonencode({
+        ignition = {
+            version = "3.2.0"
+            config  = { replace = { source = local.bootstrap_url } }
+        }
+    }))
+
+    master_custom_data = base64encode(jsonencode({
+        ignition = {
+            version = "3.2.0"
+            config  = { replace = { source = local.master_url } }
+        }
+    }))
+
+    worker_custom_data = base64encode(jsonencode({
+        ignition = {
+            version = "3.2.0"
+            config  = { replace = { source = local.worker_url } }
+        }
+    }))
+}
+
 ###
 ## DEPLOY VMS
 ##
@@ -534,13 +557,13 @@ variable "worker_count" {
     default = 3 
 }
 
-locals {
-    ign_replace = "{\"ignition\":{\"version\":\"3.2.0\",\"config\":{\"replace\":{\"source\":\"%s\"}}}}"
+# locals {
+#     ign_replace = "{\"ignition\":{\"version\":\"3.2.0\",\"config\":{\"replace\":{\"source\":\"%s\"}}}}"
 
-    bootstrap_custom_data = format(local.ign_replace, local.bootstrap_url)
-    master_custom_data    = format(local.ign_replace, local.master_url)
-    worker_custom_data    = format(local.ign_replace, local.worker_url)
-}
+#     bootstrap_custom_data = format(local.ign_replace, local.bootstrap_url)
+#     master_custom_data    = format(local.ign_replace, local.master_url)
+#     worker_custom_data    = format(local.ign_replace, local.worker_url)
+# }
 
 locals {
     rhcos_publisher = "redhat"
