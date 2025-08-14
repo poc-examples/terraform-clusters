@@ -475,49 +475,45 @@ resource "azurerm_storage_container" "ign" {
 }
 
 # Read-only SAS for the container (start a bit in the past to avoid clock skew)
-data "azurerm_storage_account_sas" "ign_ro" {
+data "azurerm_storage_blob_sas" "bootstrap" {
   connection_string = azurerm_storage_account.ign.primary_connection_string
-  https_only        = true
+  container_name    = azurerm_storage_container.ign.name
+  blob_name         = azurerm_storage_blob.bootstrap_ign.name
 
-  # start a bit in the past to avoid clock skew
-  start  = timeadd(time_static.now.rfc3339, "-15m")
-  expiry = timeadd(time_static.now.rfc3339, "168h") # 7 days
+  https_only = true
+  start      = timeadd(time_static.now.rfc3339, "-15m")
+  expiry     = timeadd(time_static.now.rfc3339, "168h")
 
-  services {
-    blob  = true
-    queue = false
-    table = false
-    file  = false
-  }
-
-  resource_types {
-    service   = true
-    container = true
-    object    = true
-  }
-
-  permissions {
-    read    = true
-    write   = false
-    delete  = false
-    list    = true
-    add     = false
-    create  = false
-    update  = false
-    process = false
-  }
-
-  # Optional but harmless to pin:
+  permissions = "r"          # read only
+  # Optional but safe to pin:
   # signed_version = "2020-08-04"
 }
 
+data "azurerm_storage_blob_sas" "master" {
+  connection_string = azurerm_storage_account.ign.primary_connection_string
+  container_name    = azurerm_storage_container.ign.name
+  blob_name         = azurerm_storage_blob.master_ign.name
+  https_only        = true
+  start             = timeadd(time_static.now.rfc3339, "-15m")
+  expiry            = timeadd(time_static.now.rfc3339, "168h")
+  permissions       = "r"
+}
 
+data "azurerm_storage_blob_sas" "worker" {
+  connection_string = azurerm_storage_account.ign.primary_connection_string
+  container_name    = azurerm_storage_container.ign.name
+  blob_name         = azurerm_storage_blob.worker_ign.name
+  https_only        = true
+  start             = timeadd(time_static.now.rfc3339, "-15m")
+  expiry            = timeadd(time_static.now.rfc3339, "168h")
+  permissions       = "r"
+}
 
 locals {
     ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
-    bootstrap_url  = "${local.ign_base}/bootstrap.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
-    master_url     = "${local.ign_base}/master.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
-    worker_url     = "${local.ign_base}/worker.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
+    bootstrap_url  = "${local.ign_base}/bootstrap.ign?${data.azurerm_storage_blob_sas.bootstrap.sas}"
+    master_url     = "${local.ign_base}/master.ign?${data.azurerm_storage_blob_sas.master.sas}"
+    worker_url     = "${local.ign_base}/worker.ign?${data.azurerm_storage_blob_sas.worker.sas}"
 }
 
 ###
