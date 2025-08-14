@@ -500,8 +500,14 @@ locals {
 ###
 ## DEPLOY VMS
 ##
-variable "master_count" { type = number, default = 3 }
-variable "worker_count" { type = number, default = 3 }
+variable "master_count" { 
+    type = number 
+    default = 3 
+}
+variable "worker_count" { 
+    type = number 
+    default = 3 
+}
 
 locals {
     ign_replace = "{\"ignition\":{\"version\":\"3.2.0\",\"config\":{\"replace\":{\"source\":\"%s\"}}}}"
