@@ -68,8 +68,8 @@ resource "azurerm_subnet" "worker_subnet" {
 # --------------------------
 resource "azurerm_network_security_group" "control_plane" {
     name                = "${var.cluster_name}-nsg-control"
-    location            = azurerm_resource_group.cluster.location
-    resource_group_name = azurerm_resource_group.cluster.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     tags                = var.tags
 
     dynamic "security_rule" {
@@ -137,8 +137,8 @@ resource "azurerm_subnet_network_security_group_association" "control_plane" {
 # --------------------------
 resource "azurerm_network_security_group" "worker_subnet" {
     name                = "${var.cluster_name}-nsg-workers"
-    location            = azurerm_resource_group.cluster.location
-    resource_group_name = azurerm_resource_group.cluster.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     tags                = var.tags
 
     dynamic "security_rule" {
@@ -205,8 +205,8 @@ resource "azurerm_subnet_network_security_group_association" "worker_subnet" {
 # --------------------------
 resource "azurerm_public_ip" "public_ip_api" {
     name                = "${var.cluster_name}-public-ip-api"
-    location            = azurerm_resource_group.cluster.location
-    resource_group_name = azurerm_resource_group.cluster.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     allocation_method   = "Static"
     sku                 = "Standard"
     tags                = var.tags
@@ -214,8 +214,8 @@ resource "azurerm_public_ip" "public_ip_api" {
 
 resource "azurerm_public_ip" "public_ip_ingress" {
     name                = "${var.cluster_name}-public-ip-ingress"
-    location            = azurerm_resource_group.cluster.location
-    resource_group_name = azurerm_resource_group.cluster.name
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
     allocation_method   = "Static"
     sku                 = "Standard"
     tags                = var.tags
