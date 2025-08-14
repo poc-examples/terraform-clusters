@@ -425,26 +425,80 @@ resource "azurerm_dns_a_record" "apps_wildcard" {
 # Private DNS for api-int
 # --------------------------
 resource "azurerm_private_dns_zone" "base" {
-  name                = "objectworksit.com"
-  resource_group_name = data.azurerm_resource_group.cluster.name
-  tags                = var.tags
+    name                = "objectworksit.com"
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    tags                = var.tags
 }
 
 # Link the private zone to the cluster VNet so VMs resolve it
 resource "azurerm_private_dns_zone_virtual_network_link" "base_link" {
-  name                  = "${var.cluster_name}-privdns-link"
-  resource_group_name   = data.azurerm_resource_group.cluster.name
-  private_dns_zone_name = azurerm_private_dns_zone.base.name
-  virtual_network_id    = azurerm_virtual_network.network.id
-  registration_enabled  = false
+    name                  = "${var.cluster_name}-privdns-link"
+    resource_group_name   = data.azurerm_resource_group.cluster.name
+    private_dns_zone_name = azurerm_private_dns_zone.base.name
+    virtual_network_id    = azurerm_virtual_network.network.id
+    registration_enabled  = false
 }
 
 # api-int.<cluster>.objectworksit.com -> Internal API LB IP
 resource "azurerm_private_dns_a_record" "api_int" {
-  name                = "api-int.${var.cluster_name}"
-  zone_name           = azurerm_private_dns_zone.base.name
-  resource_group_name = data.azurerm_resource_group.cluster.name
-  ttl                 = 60
-  records             = [var.api_int_lb_ip]
-  tags                = var.tags
+    name                = "api-int.${var.cluster_name}"
+    zone_name           = azurerm_private_dns_zone.base.name
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ttl                 = 60
+    records             = [var.api_int_lb_ip]
+    tags                = var.tags
 }
+
+
+# ---------------------------
+# Storage for Ignition Configs
+# ---------------------------
+resource "random_string" "suffix" {
+    length  = 6
+    upper   = false
+    numeric = true
+    special = false
+}
+
+resource "time_static" "now" {}
+
+resource "azurerm_storage_account" "ign" {
+    name                     = substr(lower(replace("${var.cluster_name}ign${random_string.suffix.result}", "/[^a-z0-9]/", "")), 0, 24)
+    resource_group_name      = data.azurerm_resource_group.cluster.name
+    location                 = data.azurerm_resource_group.cluster.location
+    account_tier             = "Standard"
+    account_replication_type = "LRS"
+
+    allow_nested_items_to_be_public = false
+
+}
+
+resource "azurerm_storage_container" "ign" {
+    name                  = "ignition"
+    storage_account_name  = azurerm_storage_account.ign.name
+    container_access_type = "private"
+}
+
+# Read-only SAS for the container (start a bit in the past to avoid clock skew)
+# data "azurerm_storage_account_sas" "ign_ro" {
+#     connection_string = azurerm_storage_account.ign.primary_connection_string
+#     https_only        = true
+#     # Avoid skew issues: start 15 min ago
+#     start             = timeadd(time_static.now.rfc3339, "-15m")
+#     expiry            = timeadd(time_static.now.rfc3339, "168h") # 7 days
+
+#     services       = { blob = true, queue = false, table = false, file = false }
+#     resource_types = { service = true, container = true, object = true }
+#     permissions    = {
+#         read   = true,  write  = false, delete = false, list   = true,
+#         add    = false, create = false, update = false, process = false
+#     }
+# }
+
+# locals {
+#   ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
+#   bootstrap_url  = "${local.ign_base}/${azurerm_storage_blob.bootstrap_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
+#   master_url     = "${local.ign_base}/${azurerm_storage_blob.master_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
+#   worker_url     = "${local.ign_base}/${azurerm_storage_blob.worker_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
+# }
+
