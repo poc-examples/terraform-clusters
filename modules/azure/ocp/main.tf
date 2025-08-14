@@ -400,24 +400,22 @@ resource "azurerm_dns_zone" "zone" {
     tags                = var.tags
 }
 
-# # api.<cluster>.<base_domain> -> public API PIP
-# resource "azurerm_dns_a_record" "api" {
-#   count               = var.create_dns_zone ? 1 : 0
-#   name                = "api.${var.cluster_name}"
-#   zone_name           = azurerm_dns_zone.zone[0].name
-#   resource_group_name = local.dns_rg_name
-#   ttl                 = 60
-#   records             = [azurerm_public_ip.pip_api.ip_address]
-#   tags                = var.tags
-# }
+# api.<cluster>.<base_domain> -> public API Public IP
+resource "azurerm_dns_a_record" "api" {
+    name                = "api.${var.cluster_name}"
+    zone_name           = azurerm_dns_zone.zone.name
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ttl                 = 60
+    records             = [azurerm_public_ip.public_ip_api.ip_address]
+    tags                = var.tags
+}
 
-# # *.apps.<cluster>.<base_domain> -> public Ingress PIP
-# resource "azurerm_dns_a_record" "apps_wildcard" {
-#   count               = var.create_dns_zone ? 1 : 0
-#   name                = "*.apps.${var.cluster_name}"
-#   zone_name           = azurerm_dns_zone.zone[0].name
-#   resource_group_name = local.dns_rg_name
-#   ttl                 = 60
-#   records             = [azurerm_public_ip.pip_ingress.ip_address]
-#   tags                = var.tags
-# }
+# *.apps.<cluster>.<base_domain> -> public Ingress Public IP
+resource "azurerm_dns_a_record" "apps_wildcard" {
+    name                = "*.apps.${var.cluster_name}"
+    zone_name           = azurerm_dns_zone.zone.name
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ttl                 = 60
+    records             = [azurerm_public_ip.public_ip_ingress.ip_address]
+    tags                = var.tags
+}
