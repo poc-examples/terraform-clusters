@@ -475,25 +475,200 @@ resource "azurerm_storage_container" "ign" {
 }
 
 # Read-only SAS for the container (start a bit in the past to avoid clock skew)
-# data "azurerm_storage_account_sas" "ign_ro" {
-#     connection_string = azurerm_storage_account.ign.primary_connection_string
-#     https_only        = true
-#     # Avoid skew issues: start 15 min ago
-#     start             = timeadd(time_static.now.rfc3339, "-15m")
-#     expiry            = timeadd(time_static.now.rfc3339, "168h") # 7 days
+data "azurerm_storage_account_sas" "ign_ro" {
+    connection_string = azurerm_storage_account.ign.primary_connection_string
+    https_only        = true
+    # Avoid skew issues: start 15 min ago
+    start             = timeadd(time_static.now.rfc3339, "-15m")
+    expiry            = timeadd(time_static.now.rfc3339, "168h") # 7 days
 
-#     services       = { blob = true, queue = false, table = false, file = false }
-#     resource_types = { service = true, container = true, object = true }
-#     permissions    = {
-#         read   = true,  write  = false, delete = false, list   = true,
-#         add    = false, create = false, update = false, process = false
-#     }
-# }
+    services       = { blob = true, queue = false, table = false, file = false }
+    resource_types = { service = true, container = true, object = true }
+    permissions    = {
+        read   = true,  write  = false, delete = false, list   = true,
+        add    = false, create = false, update = false, process = false
+    }
+}
 
-# locals {
-#   ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
-#   bootstrap_url  = "${local.ign_base}/${azurerm_storage_blob.bootstrap_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
-#   master_url     = "${local.ign_base}/${azurerm_storage_blob.master_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
-#   worker_url     = "${local.ign_base}/${azurerm_storage_blob.worker_ign.name}?${data.azurerm_storage_account_sas.ign_ro.sas}"
-# }
+locals {
+    ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
+    bootstrap_url  = "${local.ign_base}/bootstrap.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
+    master_url     = "${local.ign_base}/master.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
+    worker_url     = "${local.ign_base}/worker.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
+}
 
+###
+## DEPLOY VMS
+##
+variable "master_count" { type = number, default = 3 }
+variable "worker_count" { type = number, default = 3 }
+
+locals {
+    ign_replace = "{\"ignition\":{\"version\":\"3.2.0\",\"config\":{\"replace\":{\"source\":\"%s\"}}}}"
+
+    bootstrap_custom_data = format(local.ign_replace, local.bootstrap_url)
+    master_custom_data    = format(local.ign_replace, local.master_url)
+    worker_custom_data    = format(local.ign_replace, local.worker_url)
+}
+
+locals {
+    rhcos_publisher = "redhat"
+    rhcos_offer     = "rh-ocp-worker"
+    rhcos_sku       = "rh-ocp-worker"
+    rhcos_version   = "latest"
+}
+
+##
+## Bootstrap Machine
+##
+resource "azurerm_network_interface" "bootstrap" {
+    name                = "${var.cluster_name}-ni-bootstrap"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ip_configuration {
+        name                          = "ipconfig1"
+        subnet_id                     = azurerm_subnet.control_plane.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
+
+resource "azurerm_linux_virtual_machine" "bootstrap" {
+    name                = "${var.cluster_name}-vm-bootstrap"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D4s_v3"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.bootstrap.id]
+
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
+
+    custom_data = local.bootstrap_custom_data
+
+    os_disk {
+        name                 = "${var.cluster_name}-os-bootstrap"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+    }
+}
+
+#
+# MASTERS
+#
+resource "azurerm_network_interface" "master" {
+    count               = var.master_count
+    name                = "${var.cluster_name}-ni-master-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ip_configuration {
+        name                          = "ipconfig1"
+        subnet_id                     = azurerm_subnet.control_plane.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
+
+resource "azurerm_linux_virtual_machine" "master" {
+    count               = var.master_count
+    name                = "${var.cluster_name}-vm-master-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v5"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.master[count.index].id]
+
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
+
+    custom_data = local.master_custom_data
+
+    os_disk {
+        name                 = "${var.cluster_name}-os-master-${count.index}"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+    }
+}
+
+#
+# Workers
+#
+resource "azurerm_network_interface" "worker" {
+    count               = var.worker_count
+    name                = "${var.cluster_name}-ni-worker-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ip_configuration {
+        name                          = "ipconfig1"
+        subnet_id                     = azurerm_subnet.worker_subnet.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
+
+resource "azurerm_linux_virtual_machine" "worker" {
+    count               = var.worker_count
+    name                = "${var.cluster_name}-vm-worker-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v5"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.worker[count.index].id]
+
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
+
+    custom_data = local.worker_custom_data
+
+    os_disk {
+        name                 = "${var.cluster_name}-os-worker-${count.index}"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+    }
+}
+
+#
+# ip pool associations
+#
+# Bootstrap to API internal + public (only while bootstrapping)
+resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_public" {
+  network_interface_id    = azurerm_network_interface.bootstrap.id
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
+}
+resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
+  network_interface_id    = azurerm_network_interface.bootstrap.id
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
+}
+
+# Masters to API internal + public
+resource "azurerm_network_interface_backend_address_pool_association" "masters_api_public" {
+  for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
+  network_interface_id    = each.value
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
+}
+resource "azurerm_network_interface_backend_address_pool_association" "masters_api_internal" {
+  for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
+  network_interface_id    = each.value
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
+}
+
+# Workers to public ingress LB
+resource "azurerm_network_interface_backend_address_pool_association" "workers_ingress_public" {
+  for_each                = { for i, nic in azurerm_network_interface.worker : i => nic.id }
+  network_interface_id    = each.value
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_ingress_public.id
+}
