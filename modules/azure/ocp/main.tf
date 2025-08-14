@@ -476,19 +476,38 @@ resource "azurerm_storage_container" "ign" {
 
 # Read-only SAS for the container (start a bit in the past to avoid clock skew)
 data "azurerm_storage_account_sas" "ign_ro" {
-    connection_string = azurerm_storage_account.ign.primary_connection_string
-    https_only        = true
-    # Avoid skew issues: start 15 min ago
-    start             = timeadd(time_static.now.rfc3339, "-15m")
-    expiry            = timeadd(time_static.now.rfc3339, "168h") # 7 days
+  connection_string = azurerm_storage_account.ign.primary_connection_string
+  https_only        = true
 
-    services       = { blob = true, queue = false, table = false, file = false }
-    resource_types = { service = true, container = true, object = true }
-    permissions    = {
-        read   = true,  write  = false, delete = false, list   = true,
-        add    = false, create = false, update = false, process = false
-    }
+  # start a bit in the past to avoid clock skew
+  start  = timeadd(time_static.now.rfc3339, "-15m")
+  expiry = timeadd(time_static.now.rfc3339, "168h") # 7 days
+
+  services {
+    blob  = true
+    queue = false
+    table = false
+    file  = false
+  }
+
+  resource_types {
+    service   = true
+    container = true
+    object    = true
+  }
+
+  permissions {
+    read    = true
+    write   = false
+    delete  = false
+    list    = true
+    add     = false
+    create  = false
+    update  = false
+    process = false
+  }
 }
+
 
 locals {
     ign_base       = "https://${azurerm_storage_account.ign.name}.blob.core.windows.net/${azurerm_storage_container.ign.name}"
