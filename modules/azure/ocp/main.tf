@@ -453,17 +453,12 @@ resource "azurerm_private_dns_a_record" "api_int" {
 # ---------------------------
 # Storage for Ignition Configs
 # ---------------------------
-resource "random_string" "suffix" {
-    length  = 6
-    upper   = false
-    numeric = true
-    special = false
-}
+
 
 resource "time_static" "now" {}
 
 resource "azurerm_storage_account" "ign" {
-    name                     = substr(lower(replace("${var.cluster_name}ign${random_string.suffix.result}", "/[^a-z0-9]/", "")), 0, 24)
+    name                     = substr(lower(replace("${var.cluster_name}ignservicecbe}", "/[^a-z0-9]/", "")), 0, 24)
     resource_group_name      = data.azurerm_resource_group.cluster.name
     location                 = data.azurerm_resource_group.cluster.location
     account_tier             = "Standard"
