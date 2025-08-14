@@ -326,6 +326,20 @@ resource "azurerm_lb_rule" "rule_ingress_443" {
 #   number_of_probes    = 2
 # }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # # Internal API/MCS LB (6443 + 22623)
 # resource "azurerm_lb" "lb_api_internal" {
 #   name                = "${var.cluster_name}-lb-api-internal"
