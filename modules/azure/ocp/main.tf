@@ -239,19 +239,19 @@ resource "azurerm_lb" "lb_api_public" {
 }
 
 resource "azurerm_lb_backend_address_pool" "lbp_api_public" {
-  name            = "be"
-  loadbalancer_id = azurerm_lb.lb_api_public.id
+    name            = "be"
+    loadbalancer_id = azurerm_lb.lb_api_public.id
 }
 
 resource "azurerm_lb_rule" "rule_api_6443" {
-  name                           = "api-6443"
-  loadbalancer_id                = azurerm_lb.lb_api_public.id
-  protocol                       = "Tcp"
-  frontend_port                  = 6443
-  backend_port                   = 6443
-  frontend_ip_configuration_name = "fe"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_public.id]
-#   probe_id                       = azurerm_lb_probe.probe_api_6443.id
+    name                           = "api-6443"
+    loadbalancer_id                = azurerm_lb.lb_api_public.id
+    protocol                       = "Tcp"
+    frontend_port                  = 6443
+    backend_port                   = 6443
+    frontend_ip_configuration_name = "fe"
+    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_public.id]
+    #   probe_id                       = azurerm_lb_probe.probe_api_6443.id
 }
 
 # resource "azurerm_lb_probe" "probe_api_6443" {
@@ -282,30 +282,30 @@ resource "azurerm_lb" "lb_ingress_public" {
 }
 
 resource "azurerm_lb_backend_address_pool" "lbp_ingress_public" {
-  name            = "be"
-  loadbalancer_id = azurerm_lb.lb_ingress_public.id
+    name            = "be"
+    loadbalancer_id = azurerm_lb.lb_ingress_public.id
 }
 
 resource "azurerm_lb_rule" "rule_ingress_80" {
-  name                           = "ingress-80"
-  loadbalancer_id                = azurerm_lb.lb_ingress_public.id
-  protocol                       = "Tcp"
-  frontend_port                  = 80
-  backend_port                   = 80
-  frontend_ip_configuration_name = "fe"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
-#   probe_id                       = azurerm_lb_probe.probe_http_80.id
+    name                           = "ingress-80"
+    loadbalancer_id                = azurerm_lb.lb_ingress_public.id
+    protocol                       = "Tcp"
+    frontend_port                  = 80
+    backend_port                   = 80
+    frontend_ip_configuration_name = "fe"
+    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
+    #   probe_id                       = azurerm_lb_probe.probe_http_80.id
 }
 
 resource "azurerm_lb_rule" "rule_ingress_443" {
-  name                           = "ingress-443"
-  loadbalancer_id                = azurerm_lb.lb_ingress_public.id
-  protocol                       = "Tcp"
-  frontend_port                  = 443
-  backend_port                   = 443
-  frontend_ip_configuration_name = "fe"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
-#   probe_id                       = azurerm_lb_probe.probe_https_443.id
+    name                           = "ingress-443"
+    loadbalancer_id                = azurerm_lb.lb_ingress_public.id
+    protocol                       = "Tcp"
+    frontend_port                  = 443
+    backend_port                   = 443
+    frontend_ip_configuration_name = "fe"
+    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
+    #   probe_id                       = azurerm_lb_probe.probe_https_443.id
 }
 
 # resource "azurerm_lb_probe" "probe_http_80" {
@@ -327,39 +327,29 @@ resource "azurerm_lb_rule" "rule_ingress_443" {
 # }
 
 
+# --------------------------
+# Load Balancer
+# --------------------------
+# Internal API/MCS LB (6443 + 22623)
+resource "azurerm_lb" "lb_api_internal" {
+    name                = "${var.cluster_name}-lb-api-internal"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    sku                 = "Standard"
+    tags                = var.tags
 
+    frontend_ip_configuration {
+        name                          = "fe"
+        subnet_id                     = azurerm_subnet.control_plane.id
+        private_ip_address_allocation = "Static"
+        private_ip_address            = var.api_int_lb_ip
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-# # Internal API/MCS LB (6443 + 22623)
-# resource "azurerm_lb" "lb_api_internal" {
-#   name                = "${var.cluster_name}-lb-api-internal"
-#   location            = azurerm_resource_group.rg.location
-#   resource_group_name = azurerm_resource_group.rg.name
-#   sku                 = "Standard"
-#   tags                = var.tags
-
-#   frontend_ip_configuration {
-#     name                          = "fe"
-#     subnet_id                     = azurerm_subnet.control_plane.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.api_int_lb_ip
-#   }
-# }
-
-# resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
-#   name            = "be"
-#   loadbalancer_id = azurerm_lb.lb_api_internal.id
-# }
+resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
+    name            = "be"
+    loadbalancer_id = azurerm_lb.lb_api_internal.id
+}
 
 # resource "azurerm_lb_probe" "probe_api_int_6443" {
 #   name                = "tcp-6443"
@@ -379,48 +369,36 @@ resource "azurerm_lb_rule" "rule_ingress_443" {
 #   number_of_probes    = 2
 # }
 
-# resource "azurerm_lb_rule" "rule_api_int_6443" {
-#   name                           = "api-int-6443"
-#   loadbalancer_id                = azurerm_lb.lb_api_internal.id
-#   protocol                       = "Tcp"
-#   frontend_port                  = 6443
-#   backend_port                   = 6443
-#   frontend_ip_configuration_name = "fe"
-#   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
-#   probe_id                       = azurerm_lb_probe.probe_api_int_6443.id
-# }
+resource "azurerm_lb_rule" "rule_api_int_6443" {
+    name                           = "api-int-6443"
+    loadbalancer_id                = azurerm_lb.lb_api_internal.id
+    protocol                       = "Tcp"
+    frontend_port                  = 6443
+    backend_port                   = 6443
+    frontend_ip_configuration_name = "fe"
+    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
+    # probe_id                       = azurerm_lb_probe.probe_api_int_6443.id
+}
 
-# resource "azurerm_lb_rule" "rule_mcs_22623" {
-#   name                           = "mcs-22623"
-#   loadbalancer_id                = azurerm_lb.lb_api_internal.id
-#   protocol                       = "Tcp"
-#   frontend_port                  = 22623
-#   backend_port                   = 22623
-#   frontend_ip_configuration_name = "fe"
-#   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
-#   probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
-# }
+resource "azurerm_lb_rule" "rule_mcs_22623" {
+    name                           = "mcs-22623"
+    loadbalancer_id                = azurerm_lb.lb_api_internal.id
+    protocol                       = "Tcp"
+    frontend_port                  = 22623
+    backend_port                   = 22623
+    frontend_ip_configuration_name = "fe"
+    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
+    # probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
+}
 
-# # --------------------------
-# # (Optional) DNS
-# # --------------------------
-# locals {
-#   dns_rg_name = coalesce(var.dns_resource_group_name, azurerm_resource_group.rg.name)
-# }
-
-# resource "azurerm_resource_group" "dns_rg" {
-#   count    = var.create_dns_zone && var.dns_resource_group_name != null ? 1 : 0
-#   name     = var.dns_resource_group_name
-#   location = azurerm_resource_group.rg.location
-#   tags     = var.tags
-# }
-
-# resource "azurerm_dns_zone" "zone" {
-#   count               = var.create_dns_zone ? 1 : 0
-#   name                = var.base_domain
-#   resource_group_name = local.dns_rg_name
-#   tags                = var.tags
-# }
+# --------------------------
+# (Optional) DNS
+# --------------------------
+resource "azurerm_dns_zone" "zone" {
+    name                = "objectworksit.com"
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    tags                = var.tags
+}
 
 # # api.<cluster>.<base_domain> -> public API PIP
 # resource "azurerm_dns_a_record" "api" {
