@@ -10,7 +10,7 @@ data "azurerm_resource_group" "cluster" {
 # --------------------------
 resource "azurerm_virtual_network" "network" {
     name                = "${var.cluster_name}-vnet"
-    address_space       = ["10.0.0.0/22"]
+    address_space       = ["10.0.0.0/22", "10.1.0.0/24"]
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
 }
@@ -31,6 +31,14 @@ resource "azurerm_subnet" "worker_subnet" {
     virtual_network_name = azurerm_virtual_network.network.name
     address_prefixes     = ["10.0.2.0/23"]
     service_endpoints    = ["Microsoft.Storage", "Microsoft.ContainerRegistry"]
+}
+
+resource "azurerm_subnet" "bastion" {
+    name                 = "AzureBastionSubnet"
+    resource_group_name  = data.azurerm_resource_group.cluster.name
+    virtual_network_name = azurerm_virtual_network.network.name
+    address_prefixes     = ["10.1.0.0/26"]
+    # NOTE: No NSG/UDR on this subnet per Azure Bastion requirements.
 }
 
 # --------------------------
@@ -201,6 +209,33 @@ resource "azurerm_public_ip" "public_ip_ingress" {
     sku                 = "Standard"
     tags                = var.tags
 }
+
+resource "azurerm_public_ip" "bastion" {
+    name                = "${var.cluster_name}-vnet-bastion-public-ip"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    allocation_method   = "Static"
+    sku                 = "Standard"
+    tags                = var.tags
+}
+
+# --------------------------
+# Bastion Host
+# --------------------------
+resource "azurerm_bastion_host" "this" {
+    name                = "${var.cluster_name}-vnet-bastion"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    sku                 = "Standard"
+    tags                = var.tags
+
+    ip_configuration {
+        name                 = "configuration"
+        subnet_id            = azurerm_subnet.bastion.id
+        public_ip_address_id = azurerm_public_ip.bastion.id
+    }
+}
+
 
 # --------------------------
 # Load Balancer
