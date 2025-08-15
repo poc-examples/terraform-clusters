@@ -64,6 +64,30 @@ resource "azurerm_network_security_group" "control_plane" {
                 source_address_prefix      = "VirtualNetwork"
                 destination_address_prefix = "VirtualNetwork"
             },
+            # Allow Azure LB (probes + data) to API 6443
+            {
+                name                       = "allow-azurelb-6443"
+                priority                   = 105
+                direction                  = "Inbound"
+                access                     = "Allow"
+                protocol                   = "Tcp"
+                source_port_range          = "*"
+                destination_port_range     = "6443"
+                source_address_prefix      = "AzureLoadBalancer"
+                destination_address_prefix = "*"
+            },
+            # Allow Azure LB (probes + data) to MCS 22623
+            {
+                name                       = "allow-azurelb-22623"
+                priority                   = 115
+                direction                  = "Inbound"
+                access                     = "Allow"
+                protocol                   = "Tcp"
+                source_port_range          = "*"
+                destination_port_range     = "22623"
+                source_address_prefix      = "AzureLoadBalancer"
+                destination_address_prefix = "*"
+            },
             # SSH 22
             {
                 name                   = "allow-ssh-22"
@@ -369,21 +393,23 @@ resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
 }
 
 resource "azurerm_lb_probe" "probe_api_int_6443" {
-  name                = "tcp-6443"
-  loadbalancer_id     = azurerm_lb.lb_api_internal.id
-  protocol            = "Tcp"
-  port                = 6443
-  interval_in_seconds = 5
-  number_of_probes    = 2
+    name                = "tcp-6443"
+    loadbalancer_id     = azurerm_lb.lb_api_internal.id
+    protocol            = "Tcp"
+    port                = 6443
+    interval_in_seconds = 5
+    number_of_probes    = 2
+    enable_floating_ip = false
 }
 
 resource "azurerm_lb_probe" "probe_mcs_22623" {
-  name                = "tcp-22623"
-  loadbalancer_id     = azurerm_lb.lb_api_internal.id
-  protocol            = "Tcp"
-  port                = 22623
-  interval_in_seconds = 5
-  number_of_probes    = 2
+    name                = "tcp-22623"
+    loadbalancer_id     = azurerm_lb.lb_api_internal.id
+    protocol            = "Tcp"
+    port                = 22623
+    interval_in_seconds = 5
+    number_of_probes    = 2
+    enable_floating_ip = false
 }
 
 resource "azurerm_lb_rule" "rule_api_int_6443" {
