@@ -367,23 +367,23 @@ resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
     loadbalancer_id = azurerm_lb.lb_api_internal.id
 }
 
-# resource "azurerm_lb_probe" "probe_api_int_6443" {
-#   name                = "tcp-6443"
-#   loadbalancer_id     = azurerm_lb.lb_api_internal.id
-#   protocol            = "Tcp"
-#   port                = 6443
-#   interval_in_seconds = 5
-#   number_of_probes    = 2
-# }
+resource "azurerm_lb_probe" "probe_api_int_6443" {
+  name                = "tcp-6443"
+  loadbalancer_id     = azurerm_lb.lb_api_internal.id
+  protocol            = "Tcp"
+  port                = 6443
+  interval_in_seconds = 5
+  number_of_probes    = 2
+}
 
-# resource "azurerm_lb_probe" "probe_mcs_22623" {
-#   name                = "tcp-22623"
-#   loadbalancer_id     = azurerm_lb.lb_api_internal.id
-#   protocol            = "Tcp"
-#   port                = 22623
-#   interval_in_seconds = 5
-#   number_of_probes    = 2
-# }
+resource "azurerm_lb_probe" "probe_mcs_22623" {
+  name                = "tcp-22623"
+  loadbalancer_id     = azurerm_lb.lb_api_internal.id
+  protocol            = "Tcp"
+  port                = 22623
+  interval_in_seconds = 5
+  number_of_probes    = 2
+}
 
 resource "azurerm_lb_rule" "rule_api_int_6443" {
     name                           = "api-int-6443"
