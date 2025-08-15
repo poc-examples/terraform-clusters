@@ -630,7 +630,7 @@ locals {
 ##
 variable "master_count" { 
     type = number 
-    default = 1
+    default = 3
 }
 
 variable "bootstrap_count" { 
