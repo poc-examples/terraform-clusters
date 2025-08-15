@@ -633,16 +633,16 @@ locals {
 ##
 ## Bootstrap Machine
 ##
-# resource "azurerm_network_interface" "bootstrap" {
-#     name                = "${var.cluster_name}-ni-bootstrap"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     ip_configuration {
-#         name                          = "ipconfig1"
-#         subnet_id                     = azurerm_subnet.control_plane.id
-#         private_ip_address_allocation = "Dynamic"
-#     }
-# }
+resource "azurerm_network_interface" "bootstrap" {
+    name                = "${var.cluster_name}-ni-bootstrap"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ip_configuration {
+        name                          = "ipconfig1"
+        subnet_id                     = azurerm_subnet.control_plane.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
 
 # resource "azurerm_linux_virtual_machine" "bootstrap" {
 #     name                = "${var.cluster_name}-vm-bootstrap"
