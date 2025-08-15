@@ -275,6 +275,15 @@ resource "azurerm_subnet_network_security_group_association" "worker_subnet" {
 #     tags                = var.tags
 # }
 
+resource "azurerm_public_ip" "nat" {
+    name                = "${var.cluster_name}-nat-pip"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    allocation_method   = "Static"
+    sku                 = "Standard"
+    tags                = var.tags
+}
+
 resource "azurerm_public_ip" "bastion" {
     name                = "${var.cluster_name}-vnet-bastion-public-ip"
     location            = data.azurerm_resource_group.cluster.location
@@ -283,6 +292,24 @@ resource "azurerm_public_ip" "bastion" {
     sku                 = "Standard"
     tags                = var.tags
 }
+
+# --------------------------
+# NAT Gateway
+# --------------------------
+resource "azurerm_nat_gateway" "egress" {
+    name                = "${var.cluster_name}-nat"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    sku_name            = "Standard"
+    idle_timeout_in_minutes = 4
+    tags                = var.tags
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "egress" {
+    nat_gateway_id       = azurerm_nat_gateway.egress.id
+    public_ip_address_id = azurerm_public_ip.nat.id
+}
+
 
 # --------------------------
 # Bastion Host
@@ -872,3 +899,13 @@ resource "azurerm_network_interface_backend_address_pool_association" "masters_a
 #   ip_configuration_name   = "ipconfig1"
 #   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_ingress_public.id
 # }
+
+resource "azurerm_subnet_nat_gateway_association" "cp_nat" {
+    subnet_id      = azurerm_subnet.control_plane.id
+    nat_gateway_id = azurerm_nat_gateway.egress.id
+}
+
+resource "azurerm_subnet_nat_gateway_association" "workers_nat" {
+    subnet_id      = azurerm_subnet.worker_subnet.id
+    nat_gateway_id = azurerm_nat_gateway.egress.id
+}
