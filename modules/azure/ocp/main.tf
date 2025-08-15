@@ -670,7 +670,7 @@ locals {
     rhcos_publisher = "redhat"
     rhcos_offer     = "rh-ocp-worker"
     rhcos_sku       = "rh-ocp-worker"
-    rhcos_version   = "4.18.2025031114"
+    rhcos_version   = "4.17.2024100419"
 }
 
 locals {
