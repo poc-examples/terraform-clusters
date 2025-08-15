@@ -600,7 +600,7 @@ locals {
 ##
 variable "master_count" { 
     type = number 
-    default = 0
+    default = 3
 }
 variable "worker_count" { 
     type = number 
