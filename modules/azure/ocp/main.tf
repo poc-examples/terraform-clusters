@@ -197,38 +197,49 @@ resource "azurerm_network_security_group" "worker_subnet" {
 
     dynamic "security_rule" {
         for_each = [
-            # Allow intra-VNet
+            # # Allow intra-VNet
+            # {
+            #     name                       = "allow-vnet-intra"
+            #     priority                   = 100
+            #     direction                  = "Inbound"
+            #     access                     = "Allow"
+            #     protocol                   = "*"
+            #     source_port_range          = "*"
+            #     destination_port_range     = "*"
+            #     source_address_prefix      = "VirtualNetwork"
+            #     destination_address_prefix = "VirtualNetwork"
+            # },
+            # # Ingress 80/443 from Internet (via LB)
+            # {
+            #     name                   = "allow-ingress-80"
+            #     priority               = 110
+            #     direction              = "Inbound"
+            #     access                 = "Allow"
+            #     protocol               = "Tcp"
+            #     source_port_range      = "*"
+            #     destination_port_range = "80"
+            #     source_address_prefix  = "*"
+            #     destination_address_prefix = "*"
+            # },
+            # {
+            #     name                   = "allow-ingress-443"
+            #     priority               = 120
+            #     direction              = "Inbound"
+            #     access                 = "Allow"
+            #     protocol               = "Tcp"
+            #     source_port_range      = "*"
+            #     destination_port_range = "443"
+            #     source_address_prefix  = "*"
+            #     destination_address_prefix = "*"
+            # }
             {
-                name                       = "allow-vnet-intra"
-                priority                   = 100
-                direction                  = "Inbound"
-                access                     = "Allow"
-                protocol                   = "*"
-                source_port_range          = "*"
-                destination_port_range     = "*"
-                source_address_prefix      = "VirtualNetwork"
-                destination_address_prefix = "VirtualNetwork"
-            },
-            # Ingress 80/443 from Internet (via LB)
-            {
-                name                   = "allow-ingress-80"
-                priority               = 110
-                direction              = "Inbound"
-                access                 = "Allow"
-                protocol               = "Tcp"
-                source_port_range      = "*"
-                destination_port_range = "80"
-                source_address_prefix  = "*"
-                destination_address_prefix = "*"
-            },
-            {
-                name                   = "allow-ingress-443"
+                name                   = "allow-all"
                 priority               = 120
                 direction              = "Inbound"
                 access                 = "Allow"
-                protocol               = "Tcp"
+                protocol               = "*"
                 source_port_range      = "*"
-                destination_port_range = "443"
+                destination_port_range = "*"
                 source_address_prefix  = "*"
                 destination_address_prefix = "*"
             }
@@ -821,41 +832,42 @@ resource "azurerm_network_interface" "worker" {
     }
 }
 
-# resource "azurerm_linux_virtual_machine" "worker" {
-#     count               = var.worker_count
-#     name                = "${var.cluster_name}-vm-worker-${count.index}"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     size                = "Standard_D8s_v3"
-#     admin_username      = "core"
-#     network_interface_ids = [azurerm_network_interface.worker[count.index].id]
+resource "azurerm_linux_virtual_machine" "worker" {
+    count               = var.worker_count
+    name                = "${var.cluster_name}-vm-worker-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v3"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.worker[count.index].id]
 
-#     source_image_reference {
-#         publisher = local.rhcos_publisher
-#         offer     = local.rhcos_offer
-#         sku       = local.rhcos_sku
-#         version   = local.rhcos_version
-#     }
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
 
-#     admin_ssh_key {
-#         username   = "core"
-#         public_key = local.ssh_pubkey
-#     }
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
+    }
 
-#     plan {
-#         name      = "rh-ocp-worker"
-#         product   = "rh-ocp-worker"
-#         publisher = "redhat"
-#     }
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
+    }
 
-#     custom_data = local.worker_custom_data
+    custom_data = local.worker_custom_data
 
-#     os_disk {
-#         name                 = "${var.cluster_name}-os-worker-${count.index}"
-#         caching              = "ReadWrite"
-#         storage_account_type = "Premium_LRS"
-#     }
-# }
+    os_disk {
+        name                 = "${var.cluster_name}-os-worker-${count.index}"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+        disk_size_gb         = "200"
+    }
+}
 
 #
 # ip pool associations
