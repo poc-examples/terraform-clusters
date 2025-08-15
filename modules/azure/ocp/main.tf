@@ -600,11 +600,11 @@ locals {
 ##
 variable "master_count" { 
     type = number 
-    default = 1
+    default = 0
 }
 variable "worker_count" { 
     type = number 
-    default = 3 
+    default = 0
 }
 
 resource "azurerm_marketplace_agreement" "rhcos" {
