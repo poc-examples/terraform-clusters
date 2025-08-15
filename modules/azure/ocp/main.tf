@@ -52,75 +52,86 @@ resource "azurerm_network_security_group" "control_plane" {
 
     dynamic "security_rule" {
         for_each = [
-            # Allow intra-VNet
+            # # Allow intra-VNet
+            # {
+            #     name                       = "allow-vnet-intra"
+            #     priority                   = 100
+            #     direction                  = "Inbound"
+            #     access                     = "Allow"
+            #     protocol                   = "*"
+            #     source_port_range          = "*"
+            #     destination_port_range     = "*"
+            #     source_address_prefix      = "VirtualNetwork"
+            #     destination_address_prefix = "VirtualNetwork"
+            # },
+            # # Allow Azure LB (probes + data) to API 6443
+            # {
+            #     name                       = "allow-azurelb-6443"
+            #     priority                   = 105
+            #     direction                  = "Inbound"
+            #     access                     = "Allow"
+            #     protocol                   = "Tcp"
+            #     source_port_range          = "*"
+            #     destination_port_range     = "6443"
+            #     source_address_prefix      = "AzureLoadBalancer"
+            #     destination_address_prefix = "*"
+            # },
+            # # Allow Azure LB (probes + data) to MCS 22623
+            # {
+            #     name                       = "allow-azurelb-22623"
+            #     priority                   = 115
+            #     direction                  = "Inbound"
+            #     access                     = "Allow"
+            #     protocol                   = "Tcp"
+            #     source_port_range          = "*"
+            #     destination_port_range     = "22623"
+            #     source_address_prefix      = "AzureLoadBalancer"
+            #     destination_address_prefix = "*"
+            # },
+            # # SSH 22
+            # {
+            #     name                   = "allow-ssh-22"
+            #     priority               = 130
+            #     direction              = "Inbound"
+            #     access                 = "Allow"
+            #     protocol               = "Tcp"
+            #     source_port_range      = "*"
+            #     destination_port_range = "22"
+            #     source_address_prefix  = "*"
+            #     destination_address_prefix = "*"
+            # },
+            # {
+            #     name                   = "allow-api-6443"
+            #     priority               = 110
+            #     direction              = "Inbound"
+            #     access                 = "Allow"
+            #     protocol               = "Tcp"
+            #     source_port_range      = "*"
+            #     destination_port_range = "6443"
+            #     source_address_prefix  = "*"
+            #     destination_address_prefix = "*"
+            # },
+            # # MCS 22623 (internal LB / nodes)
+            # {
+            #     name                   = "allow-mcs-22623"
+            #     priority               = 120
+            #     direction              = "Inbound"
+            #     access                 = "Allow"
+            #     protocol               = "Tcp"
+            #     source_port_range      = "*"
+            #     destination_port_range = "22623"
+            #     source_address_prefix  = "VirtualNetwork"
+            #     destination_address_prefix = "*"
+            # },
             {
-                name                       = "allow-vnet-intra"
-                priority                   = 100
-                direction                  = "Inbound"
-                access                     = "Allow"
-                protocol                   = "*"
-                source_port_range          = "*"
-                destination_port_range     = "*"
-                source_address_prefix      = "VirtualNetwork"
-                destination_address_prefix = "VirtualNetwork"
-            },
-            # Allow Azure LB (probes + data) to API 6443
-            {
-                name                       = "allow-azurelb-6443"
-                priority                   = 105
-                direction                  = "Inbound"
-                access                     = "Allow"
-                protocol                   = "Tcp"
-                source_port_range          = "*"
-                destination_port_range     = "6443"
-                source_address_prefix      = "AzureLoadBalancer"
-                destination_address_prefix = "*"
-            },
-            # Allow Azure LB (probes + data) to MCS 22623
-            {
-                name                       = "allow-azurelb-22623"
-                priority                   = 115
-                direction                  = "Inbound"
-                access                     = "Allow"
-                protocol                   = "Tcp"
-                source_port_range          = "*"
-                destination_port_range     = "22623"
-                source_address_prefix      = "AzureLoadBalancer"
-                destination_address_prefix = "*"
-            },
-            # SSH 22
-            {
-                name                   = "allow-ssh-22"
-                priority               = 130
-                direction              = "Inbound"
-                access                 = "Allow"
-                protocol               = "Tcp"
-                source_port_range      = "*"
-                destination_port_range = "22"
-                source_address_prefix  = "*"
-                destination_address_prefix = "*"
-            },
-            {
-                name                   = "allow-api-6443"
-                priority               = 110
-                direction              = "Inbound"
-                access                 = "Allow"
-                protocol               = "Tcp"
-                source_port_range      = "*"
-                destination_port_range = "6443"
-                source_address_prefix  = "*"
-                destination_address_prefix = "*"
-            },
-            # MCS 22623 (internal LB / nodes)
-            {
-                name                   = "allow-mcs-22623"
+                name                   = "allow-all"
                 priority               = 120
                 direction              = "Inbound"
                 access                 = "Allow"
-                protocol               = "Tcp"
+                protocol               = "*"
                 source_port_range      = "*"
-                destination_port_range = "22623"
-                source_address_prefix  = "VirtualNetwork"
+                destination_port_range = "*"
+                source_address_prefix  = "*"
                 destination_address_prefix = "*"
             }
         ]
@@ -627,41 +638,41 @@ resource "azurerm_network_interface" "bootstrap" {
     }
 }
 
-# resource "azurerm_linux_virtual_machine" "bootstrap" {
-#     name                = "${var.cluster_name}-vm-bootstrap"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     size                = "Standard_D8s_v3"
-#     admin_username      = "core"
-#     network_interface_ids = [azurerm_network_interface.bootstrap.id]
+resource "azurerm_linux_virtual_machine" "bootstrap" {
+    name                = "${var.cluster_name}-vm-bootstrap"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v3"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.bootstrap.id]
 
-#     source_image_reference {
-#         publisher = local.rhcos_publisher
-#         offer     = local.rhcos_offer
-#         sku       = local.rhcos_sku
-#         version   = local.rhcos_version
-#     }
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
 
-#     admin_ssh_key {
-#         username   = "core"
-#         public_key = local.ssh_pubkey
-#     }
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
+    }
 
-#     plan {
-#         name      = "rh-ocp-worker"
-#         product   = "rh-ocp-worker"
-#         publisher = "redhat"
-#     }
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
+    }
 
-#     custom_data = local.bootstrap_custom_data
+    custom_data = local.bootstrap_custom_data
 
-#     os_disk {
-#         name                 = "${var.cluster_name}-os-bootstrap"
-#         caching              = "ReadWrite"
-#         storage_account_type = "Premium_LRS"
-#         disk_size_gb         = "1000"
-#     }
-# }
+    os_disk {
+        name                 = "${var.cluster_name}-os-bootstrap"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+        disk_size_gb         = "1000"
+    }
+}
 
 #
 # MASTERS
@@ -678,42 +689,42 @@ resource "azurerm_network_interface" "master" {
     }
 }
 
-# resource "azurerm_linux_virtual_machine" "master" {
-#     count               = var.master_count
-#     name                = "${var.cluster_name}-vm-master-${count.index}"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     size                = "Standard_D8s_v3"
-#     admin_username      = "core"
-#     network_interface_ids = [azurerm_network_interface.master[count.index].id]
+resource "azurerm_linux_virtual_machine" "master" {
+    count               = var.master_count
+    name                = "${var.cluster_name}-vm-master-${count.index}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v3"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.master[count.index].id]
 
-#     source_image_reference {
-#         publisher = local.rhcos_publisher
-#         offer     = local.rhcos_offer
-#         sku       = local.rhcos_sku
-#         version   = local.rhcos_version
-#     }
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
 
-#     admin_ssh_key {
-#         username   = "core"
-#         public_key = local.ssh_pubkey
-#     }
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
+    }
 
-#     plan {
-#         name      = "rh-ocp-worker"
-#         product   = "rh-ocp-worker"
-#         publisher = "redhat"
-#     }
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
+    }
 
-#     custom_data = local.master_custom_data
+    custom_data = local.master_custom_data
 
-#     os_disk {
-#         name                 = "${var.cluster_name}-os-master-${count.index}"
-#         caching              = "ReadWrite"
-#         storage_account_type = "Premium_LRS"
-#         disk_size_gb         = "1000"
-#     }
-# }
+    os_disk {
+        name                 = "${var.cluster_name}-os-master-${count.index}"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+        disk_size_gb         = "1000"
+    }
+}
 
 #
 # Workers
