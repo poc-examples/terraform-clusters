@@ -695,7 +695,7 @@ variable "bootstrap_count" {
 
 variable "worker_count" { 
     type = number 
-    default = 0
+    default = 3
 }
 
 resource "azurerm_marketplace_agreement" "rhcos" {
@@ -718,52 +718,52 @@ locals {
 ##
 ## Bootstrap Machine
 ##
-resource "azurerm_network_interface" "bootstrap" {
-    name                = "${var.cluster_name}-ni-bootstrap"
-    location            = data.azurerm_resource_group.cluster.location
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    ip_configuration {
-        name                          = "ipconfig1"
-        subnet_id                     = azurerm_subnet.control_plane.id
-        private_ip_address_allocation = "Dynamic"
-    }
-}
+# resource "azurerm_network_interface" "bootstrap" {
+#     name                = "${var.cluster_name}-ni-bootstrap"
+#     location            = data.azurerm_resource_group.cluster.location
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     ip_configuration {
+#         name                          = "ipconfig1"
+#         subnet_id                     = azurerm_subnet.control_plane.id
+#         private_ip_address_allocation = "Dynamic"
+#     }
+# }
 
-resource "azurerm_linux_virtual_machine" "bootstrap" {
-    name                = "${var.cluster_name}-vm-bootstrap"
-    location            = data.azurerm_resource_group.cluster.location
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    size                = "Standard_D8s_v3"
-    admin_username      = "core"
-    network_interface_ids = [azurerm_network_interface.bootstrap.id]
+# resource "azurerm_linux_virtual_machine" "bootstrap" {
+#     name                = "${var.cluster_name}-vm-bootstrap"
+#     location            = data.azurerm_resource_group.cluster.location
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     size                = "Standard_D8s_v3"
+#     admin_username      = "core"
+#     network_interface_ids = [azurerm_network_interface.bootstrap.id]
 
-    source_image_reference {
-        publisher = local.rhcos_publisher
-        offer     = local.rhcos_offer
-        sku       = local.rhcos_sku
-        version   = local.rhcos_version
-    }
+#     source_image_reference {
+#         publisher = local.rhcos_publisher
+#         offer     = local.rhcos_offer
+#         sku       = local.rhcos_sku
+#         version   = local.rhcos_version
+#     }
 
-    admin_ssh_key {
-        username   = "core"
-        public_key = local.ssh_pubkey
-    }
+#     admin_ssh_key {
+#         username   = "core"
+#         public_key = local.ssh_pubkey
+#     }
 
-    plan {
-        name      = "rh-ocp-worker"
-        product   = "rh-ocp-worker"
-        publisher = "redhat"
-    }
+#     plan {
+#         name      = "rh-ocp-worker"
+#         product   = "rh-ocp-worker"
+#         publisher = "redhat"
+#     }
 
-    custom_data = local.bootstrap_custom_data
+#     custom_data = local.bootstrap_custom_data
 
-    os_disk {
-        name                 = "${var.cluster_name}-os-bootstrap"
-        caching              = "ReadWrite"
-        storage_account_type = "Premium_LRS"
-        disk_size_gb         = "1000"
-    }
-}
+#     os_disk {
+#         name                 = "${var.cluster_name}-os-bootstrap"
+#         caching              = "ReadWrite"
+#         storage_account_type = "Premium_LRS"
+#         disk_size_gb         = "1000"
+#     }
+# }
 
 #
 # MASTERS
@@ -878,11 +878,13 @@ resource "azurerm_linux_virtual_machine" "worker" {
 #   ip_configuration_name   = "ipconfig1"
 #   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
 # }
-resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
-  network_interface_id    = azurerm_network_interface.bootstrap.id
-  ip_configuration_name   = "ipconfig1"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
-}
+
+# TURN THIS BACK ON TO INSTALL
+# # resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
+# #   network_interface_id    = azurerm_network_interface.bootstrap.id
+# #   ip_configuration_name   = "ipconfig1"
+# #   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
+# # }
 
 # resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_mcs_internal" {
 #   network_interface_id    = azurerm_network_interface.bootstrap.id
