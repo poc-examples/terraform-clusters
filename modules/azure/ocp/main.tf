@@ -311,7 +311,7 @@ resource "azurerm_lb_rule" "rule_ingress_80" {
     backend_port                   = 80
     frontend_ip_configuration_name = "fe"
     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
-    #   probe_id                       = azurerm_lb_probe.probe_http_80.id
+    probe_id                       = azurerm_lb_probe.probe_http_80.id
 }
 
 resource "azurerm_lb_rule" "rule_ingress_443" {
@@ -322,7 +322,7 @@ resource "azurerm_lb_rule" "rule_ingress_443" {
     backend_port                   = 443
     frontend_ip_configuration_name = "fe"
     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_ingress_public.id]
-    #   probe_id                       = azurerm_lb_probe.probe_https_443.id
+    probe_id                       = azurerm_lb_probe.probe_https_443.id
 }
 
 # resource "azurerm_lb_probe" "probe_http_80" {
