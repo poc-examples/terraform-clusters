@@ -399,7 +399,6 @@ resource "azurerm_lb_probe" "probe_api_int_6443" {
     port                = 6443
     interval_in_seconds = 5
     number_of_probes    = 2
-    enable_floating_ip = false
 }
 
 resource "azurerm_lb_probe" "probe_mcs_22623" {
@@ -409,7 +408,6 @@ resource "azurerm_lb_probe" "probe_mcs_22623" {
     port                = 22623
     interval_in_seconds = 5
     number_of_probes    = 2
-    enable_floating_ip = false
 }
 
 resource "azurerm_lb_rule" "rule_api_int_6443" {
@@ -421,6 +419,7 @@ resource "azurerm_lb_rule" "rule_api_int_6443" {
     frontend_ip_configuration_name = "fe"
     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
     probe_id                       = azurerm_lb_probe.probe_api_int_6443.id
+    enable_floating_ip             = false
 }
 
 resource "azurerm_lb_rule" "rule_mcs_22623" {
@@ -432,6 +431,7 @@ resource "azurerm_lb_rule" "rule_mcs_22623" {
     frontend_ip_configuration_name = "fe"
     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
     probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
+    enable_floating_ip             = false
 }
 
 # --------------------------
