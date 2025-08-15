@@ -433,6 +433,23 @@ resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
     loadbalancer_id = azurerm_lb.lb_api_internal.id
 }
 
+resource "azurerm_lb_backend_address_pool" "lbp_mcs_internal" {
+  name            = "be-mcs"
+  loadbalancer_id = azurerm_lb.lb_api_internal.id
+}
+
+resource "azurerm_lb_rule" "rule_mcs_22623" {
+  name                           = "mcs-22623"
+  loadbalancer_id                = azurerm_lb.lb_api_internal.id
+  protocol                       = "Tcp"
+  frontend_port                  = 22623
+  backend_port                   = 22623
+  frontend_ip_configuration_name = "fe"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_mcs_internal.id]
+  probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
+  enable_floating_ip             = false
+}
+
 resource "azurerm_lb_probe" "probe_api_int_6443" {
     name                = "tcp-6443"
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
@@ -463,17 +480,17 @@ resource "azurerm_lb_rule" "rule_api_int_6443" {
     enable_floating_ip             = false
 }
 
-resource "azurerm_lb_rule" "rule_mcs_22623" {
-    name                           = "mcs-22623"
-    loadbalancer_id                = azurerm_lb.lb_api_internal.id
-    protocol                       = "Tcp"
-    frontend_port                  = 22623
-    backend_port                   = 22623
-    frontend_ip_configuration_name = "fe"
-    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
-    probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
-    enable_floating_ip             = false
-}
+# resource "azurerm_lb_rule" "rule_mcs_22623" {
+#     name                           = "mcs-22623"
+#     loadbalancer_id                = azurerm_lb.lb_api_internal.id
+#     protocol                       = "Tcp"
+#     frontend_port                  = 22623
+#     backend_port                   = 22623
+#     frontend_ip_configuration_name = "fe"
+#     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_api_internal.id]
+#     probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
+#     enable_floating_ip             = false
+# }
 
 # --------------------------
 # Public DNS
@@ -826,6 +843,12 @@ resource "azurerm_network_interface_backend_address_pool_association" "bootstrap
   network_interface_id    = azurerm_network_interface.bootstrap.id
   ip_configuration_name   = "ipconfig1"
   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_mcs_internal" {
+  network_interface_id    = azurerm_network_interface.bootstrap.id
+  ip_configuration_name   = "ipconfig1"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_mcs_internal.id
 }
 
 # Masters to API internal + public
