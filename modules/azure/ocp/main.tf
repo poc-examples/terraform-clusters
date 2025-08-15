@@ -227,6 +227,7 @@ resource "azurerm_bastion_host" "this" {
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
+    tunneling_enabled   = true
     tags                = var.tags
 
     ip_configuration {
