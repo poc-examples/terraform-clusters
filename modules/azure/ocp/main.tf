@@ -834,11 +834,11 @@ resource "azurerm_network_interface" "worker" {
 # ip pool associations
 #
 # Bootstrap to API internal + public (only while bootstrapping)
-resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_public" {
-  network_interface_id    = azurerm_network_interface.bootstrap.id
-  ip_configuration_name   = "ipconfig1"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
-}
+# resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_public" {
+#   network_interface_id    = azurerm_network_interface.bootstrap.id
+#   ip_configuration_name   = "ipconfig1"
+#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
+# }
 resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
   network_interface_id    = azurerm_network_interface.bootstrap.id
   ip_configuration_name   = "ipconfig1"
@@ -852,12 +852,12 @@ resource "azurerm_network_interface_backend_address_pool_association" "bootstrap
 }
 
 # Masters to API internal + public
-resource "azurerm_network_interface_backend_address_pool_association" "masters_api_public" {
-  for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
-  network_interface_id    = each.value
-  ip_configuration_name   = "ipconfig1"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
-}
+# resource "azurerm_network_interface_backend_address_pool_association" "masters_api_public" {
+#   for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
+#   network_interface_id    = each.value
+#   ip_configuration_name   = "ipconfig1"
+#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
+# }
 resource "azurerm_network_interface_backend_address_pool_association" "masters_api_internal" {
   for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
   network_interface_id    = each.value
