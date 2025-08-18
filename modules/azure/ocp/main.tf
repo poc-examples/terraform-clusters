@@ -535,11 +535,11 @@ resource "azurerm_lb_rule" "rule_mcs_22623" {
 # --------------------------
 # Public DNS
 # --------------------------
-# resource "azurerm_dns_zone" "zone" {
-#     name                = "objectworksit.com"
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     tags                = var.tags
-# }
+resource "azurerm_dns_zone" "zone" {
+    name                = "objectworksit.com"
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    tags                = var.tags
+}
 
 # # api.<cluster>.<base_domain> -> public API Public IP
 # resource "azurerm_dns_a_record" "api" {
