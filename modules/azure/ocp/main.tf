@@ -1,6 +1,16 @@
 ###############
 ## START
 ###############
+locals {
+  workers = [
+    { name = "worker-0", ip = "10.0.0.20" },
+    { name = "worker-1", ip = "10.0.0.21" },
+    { name = "worker-2", ip = "10.0.0.22" },
+  ]
+
+  workers_by_name = { for w in local.workers : w.name => w }
+}
+
 data "azurerm_resource_group" "cluster" {
     name     = var.resource_group_name
 }
@@ -9,30 +19,30 @@ data "azurerm_resource_group" "cluster" {
 # Ignition Files
 # --------------------------
 resource "azurerm_storage_blob" "ign_bootstrap" {
-  name                   = "bootstrap.ign"
-  storage_account_name   = azurerm_storage_account.ign.name
-  storage_container_name = azurerm_storage_container.ign.name
-  type                   = "Block"
-  content_type           = "application/json"
-  source                 = "/usr/src/app/terraform/bootstrap.ign"  # path to your file
+    name                   = "bootstrap.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/bootstrap.ign"  # path to your file
 }
 
 resource "azurerm_storage_blob" "ign_master" {
-  name                   = "master.ign"
-  storage_account_name   = azurerm_storage_account.ign.name
-  storage_container_name = azurerm_storage_container.ign.name
-  type                   = "Block"
-  content_type           = "application/json"
-  source                 = "/usr/src/app/terraform/master.ign"
+    name                   = "master.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/master.ign"
 }
 
 resource "azurerm_storage_blob" "ign_worker" {
-  name                   = "worker.ign"
-  storage_account_name   = azurerm_storage_account.ign.name
-  storage_container_name = azurerm_storage_container.ign.name
-  type                   = "Block"
-  content_type           = "application/json"
-  source                 = "/usr/src/app/terraform/worker.ign"
+    name                   = "worker.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/worker.ign"
 }
 
 # --------------------------
@@ -659,6 +669,9 @@ locals {
     worker_url     = "${local.ign_base}/worker.ign?${data.azurerm_storage_account_sas.ign_ro.sas}"
 }
 
+
+
+#### Stopping
 locals {
     bootstrap_custom_data = base64encode(jsonencode({
         ignition = {
@@ -687,7 +700,7 @@ locals {
 ##
 variable "master_count" { 
     type = number 
-    default = 3
+    default = 0
 }
 
 variable "bootstrap_count" { 
@@ -697,7 +710,7 @@ variable "bootstrap_count" {
 
 variable "worker_count" { 
     type = number 
-    default = 3
+    default = 0
 }
 
 resource "azurerm_marketplace_agreement" "rhcos" {
@@ -720,16 +733,16 @@ locals {
 ##
 ## Bootstrap Machine
 ##
-# resource "azurerm_network_interface" "bootstrap" {
-#     name                = "${var.cluster_name}-ni-bootstrap"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     ip_configuration {
-#         name                          = "ipconfig1"
-#         subnet_id                     = azurerm_subnet.control_plane.id
-#         private_ip_address_allocation = "Dynamic"
-#     }
-# }
+resource "azurerm_network_interface" "bootstrap" {
+    name                = "${var.cluster_name}-ni-bootstrap"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    ip_configuration {
+        name                          = "ipconfig1"
+        subnet_id                     = azurerm_subnet.control_plane.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
 
 # resource "azurerm_linux_virtual_machine" "bootstrap" {
 #     name                = "${var.cluster_name}-vm-bootstrap"
@@ -882,11 +895,11 @@ resource "azurerm_linux_virtual_machine" "worker" {
 # }
 
 # TURN THIS BACK ON TO INSTALL
-# # resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
-# #   network_interface_id    = azurerm_network_interface.bootstrap.id
-# #   ip_configuration_name   = "ipconfig1"
-# #   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
-# # }
+# resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
+#   network_interface_id    = azurerm_network_interface.bootstrap.id
+#   ip_configuration_name   = "ipconfig1"
+#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
+# }
 
 # resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_mcs_internal" {
 #   network_interface_id    = azurerm_network_interface.bootstrap.id
