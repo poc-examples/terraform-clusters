@@ -11,41 +11,41 @@ resource "azurerm_network_interface" "bootstrap" {
     }
 }
 
-# resource "azurerm_linux_virtual_machine" "bootstrap" {
-#     name                = "${var.cluster_name}-vm-${local.bootstrap.name}"
-#     location            = data.azurerm_resource_group.cluster.location
-#     resource_group_name = data.azurerm_resource_group.cluster.name
-#     size                = "Standard_D8s_v3"
-#     admin_username      = "core"
-#     network_interface_ids = [azurerm_network_interface.bootstrap.id]
+resource "azurerm_linux_virtual_machine" "bootstrap" {
+    name                = "${var.cluster_name}-vm-${local.bootstrap.name}"
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    size                = "Standard_D8s_v3"
+    admin_username      = "core"
+    network_interface_ids = [azurerm_network_interface.bootstrap.id]
 
-#     source_image_reference {
-#         publisher = local.rhcos_publisher
-#         offer     = local.rhcos_offer
-#         sku       = local.rhcos_sku
-#         version   = local.rhcos_version
-#     }
+    source_image_reference {
+        publisher = local.rhcos_publisher
+        offer     = local.rhcos_offer
+        sku       = local.rhcos_sku
+        version   = local.rhcos_version
+    }
 
-#     admin_ssh_key {
-#         username   = "core"
-#         public_key = local.ssh_pubkey
-#     }
+    admin_ssh_key {
+        username   = "core"
+        public_key = local.ssh_pubkey
+    }
 
-#     plan {
-#         name      = "rh-ocp-worker"
-#         product   = "rh-ocp-worker"
-#         publisher = "redhat"
-#     }
+    plan {
+        name      = "rh-ocp-worker"
+        product   = "rh-ocp-worker"
+        publisher = "redhat"
+    }
 
-#     custom_data = local.bootstrap_custom_data
+    custom_data = local.bootstrap_custom_data
 
-#     os_disk {
-#         name                 = "${var.cluster_name}-os-${local.bootstrap.name}"
-#         caching              = "ReadWrite"
-#         storage_account_type = "Premium_LRS"
-#         disk_size_gb         = "200"
-#     }
-# }
+    os_disk {
+        name                 = "${var.cluster_name}-os-${local.bootstrap.name}"
+        caching              = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+        disk_size_gb         = "200"
+    }
+}
 
 resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
     network_interface_id    = azurerm_network_interface.bootstrap.id
