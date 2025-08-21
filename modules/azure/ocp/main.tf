@@ -178,30 +178,6 @@ resource "azurerm_virtual_network" "network" {
 #     enable_floating_ip             = false
 # }
 
-
-# --------------------------
-# Load Balancer
-# --------------------------
-# Internal API/MCS LB (6443 + 22623)
-
-
-# resource "azurerm_lb_backend_address_pool" "lbp_mcs_internal" {
-#   name            = "be-mcs"
-#   loadbalancer_id = azurerm_lb.lb_api_internal.id
-# }
-
-# resource "azurerm_lb_rule" "rule_mcs_22623" {
-#   name                           = "mcs-22623"
-#   loadbalancer_id                = azurerm_lb.lb_api_internal.id
-#   protocol                       = "Tcp"
-#   frontend_port                  = 22623
-#   backend_port                   = 22623
-#   frontend_ip_configuration_name = "fe"
-#   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lbp_mcs_internal.id]
-#   probe_id                       = azurerm_lb_probe.probe_mcs_22623.id
-#   enable_floating_ip             = false
-# }
-
 # --------------------------
 # Public DNS
 # --------------------------
@@ -224,46 +200,4 @@ resource "azurerm_virtual_network" "network" {
 #     ttl                 = 60
 #     records             = [azurerm_public_ip.public_ip_ingress.ip_address]
 #     tags                = var.tags
-# }
-
-
-
-
-#
-# ip pool associations
-#
-# Bootstrap to API internal + public (only while bootstrapping)
-# resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_public" {
-#   network_interface_id    = azurerm_network_interface.bootstrap.id
-#   ip_configuration_name   = "ipconfig1"
-#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
-# }
-
-# TURN THIS BACK ON TO INSTALL
-# resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
-#   network_interface_id    = azurerm_network_interface.bootstrap.id
-#   ip_configuration_name   = "ipconfig1"
-#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_internal.id
-# }
-
-# resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_mcs_internal" {
-#   network_interface_id    = azurerm_network_interface.bootstrap.id
-#   ip_configuration_name   = "ipconfig1"
-#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_mcs_internal.id
-# }
-
-# Masters to API internal + public
-# resource "azurerm_network_interface_backend_address_pool_association" "masters_api_public" {
-#   for_each                = { for i, nic in azurerm_network_interface.master : i => nic.id }
-#   network_interface_id    = each.value
-#   ip_configuration_name   = "ipconfig1"
-#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_api_public.id
-# }
-
-# Workers to public ingress LB
-# resource "azurerm_network_interface_backend_address_pool_association" "workers_ingress_public" {
-#   for_each                = { for i, nic in azurerm_network_interface.worker : i => nic.id }
-#   network_interface_id    = each.value
-#   ip_configuration_name   = "ipconfig1"
-#   backend_address_pool_id = azurerm_lb_backend_address_pool.lbp_ingress_public.id
 # }

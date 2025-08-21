@@ -1,3 +1,4 @@
+# https://mirror.openshift.com/pub/openshift-v4/clients/ocp/
 locals {
     storage_account = azurerm_storage_account.ign.name
     container       = azurerm_storage_container.ign.name
