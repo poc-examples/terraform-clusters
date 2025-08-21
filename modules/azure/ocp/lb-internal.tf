@@ -19,9 +19,9 @@ resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
 }
 
 resource "azurerm_lb_probe" "probe_mcs_22623" {
-    name                = "tcp-22623"
+    name                = "https-22623"
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
-    protocol            = "Tcp"
+    protocol            = "Https"
     port                = 22623
     request_path        = "/healthz"
     interval_in_seconds = 10
@@ -29,9 +29,9 @@ resource "azurerm_lb_probe" "probe_mcs_22623" {
 }
 
 resource "azurerm_lb_probe" "probe_api_int_6443" {
-    name                = "tcp-6443"
+    name                = "https-6443"
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
-    protocol            = "Tcp"
+    protocol            = "Https"
     port                = 6443
     request_path        = "/readyz"
     interval_in_seconds = 10
