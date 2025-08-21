@@ -23,8 +23,9 @@ resource "azurerm_lb_probe" "probe_mcs_22623" {
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
     protocol            = "Tcp"
     port                = 22623
-    interval_in_seconds = 5
-    number_of_probes    = 2
+    request_path        = "/healthz"
+    interval_in_seconds = 10
+    number_of_probes    = 3
 }
 
 resource "azurerm_lb_probe" "probe_api_int_6443" {
@@ -32,8 +33,9 @@ resource "azurerm_lb_probe" "probe_api_int_6443" {
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
     protocol            = "Tcp"
     port                = 6443
-    interval_in_seconds = 5
-    number_of_probes    = 2
+    request_path        = "/readyz"
+    interval_in_seconds = 10
+    number_of_probes    = 3
 }
 
 resource "azurerm_lb_rule" "rule_api_int_6443" {
