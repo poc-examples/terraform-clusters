@@ -53,5 +53,5 @@ resource "azurerm_linux_virtual_machine" "worker" {
 
 resource "azurerm_subnet_nat_gateway_association" "workers_nat" {
     subnet_id      = azurerm_subnet.worker_subnet.id
-    nat_gateway_id = azurerm_nat_gateway.egress.id
+    nat_gateway_id = azurerm_nat_gateway.nat_egress.id
 }

@@ -18,7 +18,7 @@ resource "azurerm_nat_gateway" "nat_egress" {
 
 resource "azurerm_nat_gateway_public_ip_association" "nat_egress" {
     nat_gateway_id       = azurerm_nat_gateway.nat_egress.id
-    public_ip_address_id = azurerm_public_ip.nat_gress.id
+    public_ip_address_id = azurerm_public_ip.nat_egress.id
 }
 
 resource "azurerm_subnet_nat_gateway_association" "nat-egress" {
