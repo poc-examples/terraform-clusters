@@ -25,3 +25,8 @@ resource "azurerm_subnet_nat_gateway_association" "nat-egress" {
     subnet_id      = azurerm_subnet.bootstrap.id
     nat_gateway_id = azurerm_nat_gateway.nat_egress.id
 }
+
+resource "azurerm_subnet_nat_gateway_association" "control-nat-egress" {
+    subnet_id      = azurerm_subnet.control_plane.id
+    nat_gateway_id = azurerm_nat_gateway.nat_egress.id
+}
