@@ -50,8 +50,6 @@ resource "azurerm_storage_container" "ign" {
     container_access_type = "private"
 }
 
-resource "time_static" "now" {}
-
 data "azurerm_storage_account_sas" "ign_ro" {
   connection_string = azurerm_storage_account.ign.primary_connection_string
   https_only        = true
