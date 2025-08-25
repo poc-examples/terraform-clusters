@@ -88,29 +88,29 @@ data "azurerm_storage_account_sas" "ign_ro" {
   # signed_version = "2020-08-04"
 }
 
-# resource "azurerm_storage_blob" "ign_bootstrap" {
-#     name                   = "bootstrap.ign"
-#     storage_account_name   = azurerm_storage_account.ign.name
-#     storage_container_name = azurerm_storage_container.ign.name
-#     type                   = "Block"
-#     content_type           = "application/json"
-#     source                 = "/usr/src/app/terraform/bootstrap.ign"
-# }
+resource "azurerm_storage_blob" "ign_bootstrap" {
+    name                   = "bootstrap.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/bootstrap.ign"
+}
 
-# resource "azurerm_storage_blob" "ign_master" {
-#     name                   = "master.ign"
-#     storage_account_name   = azurerm_storage_account.ign.name
-#     storage_container_name = azurerm_storage_container.ign.name
-#     type                   = "Block"
-#     content_type           = "application/json"
-#     source                 = "/usr/src/app/terraform/master.ign"
-# }
+resource "azurerm_storage_blob" "ign_master" {
+    name                   = "master.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/master.ign"
+}
 
-# resource "azurerm_storage_blob" "ign_worker" {
-#     name                   = "worker.ign"
-#     storage_account_name   = azurerm_storage_account.ign.name
-#     storage_container_name = azurerm_storage_container.ign.name
-#     type                   = "Block"
-#     content_type           = "application/json"
-#     source                 = "/usr/src/app/terraform/worker.ign"
-# }
+resource "azurerm_storage_blob" "ign_worker" {
+    name                   = "worker.ign"
+    storage_account_name   = azurerm_storage_account.ign.name
+    storage_container_name = azurerm_storage_container.ign.name
+    type                   = "Block"
+    content_type           = "application/json"
+    source                 = "/usr/src/app/terraform/worker.ign"
+}
