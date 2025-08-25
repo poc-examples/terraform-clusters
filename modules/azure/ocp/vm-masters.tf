@@ -8,7 +8,7 @@ resource "azurerm_network_interface" "master" {
     ip_configuration {
         name                            = "ipconfig1"
         subnet_id                       = azurerm_subnet.control_plane.id
-        private_ip_address_allocation   = "Dynamic"
+        private_ip_address_allocation   = "Static"
         private_ip_address              = each.value.ip
     }
 }
