@@ -7,7 +7,7 @@ resource "azurerm_network_interface" "nettest" {
         name                            = "ipconfig1"
         subnet_id                       = azurerm_subnet.control_plane.id
         private_ip_address_allocation   = "Static"
-        private_ip_address              = "10.0.2.8"
+        private_ip_address              = "10.0.1.9"
     }
 
     tags = var.tags
