@@ -71,11 +71,6 @@ variable "worker_node_count" {
     }
 }
 
-variable "api_int_lb_ip" {
-    type        = string
-    default = "10.0.0.5" # Example reserved IP
-}
-
 # variable "vnet_cidr" {
 #   description = "CIDR for the VNet."
 #   type        = string
