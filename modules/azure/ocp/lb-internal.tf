@@ -29,8 +29,8 @@ resource "azurerm_lb_probe" "probe_mcs_22623" {
     # protocol            = "Tcp"
     port                = 22623
     request_path        = "/healthz"
-    interval_in_seconds = 5
-    number_of_probes    = 2
+    interval_in_seconds = 20
+    number_of_probes    = 6
 }
 
 resource "azurerm_lb_probe" "probe_api_int_6443" {
@@ -40,8 +40,8 @@ resource "azurerm_lb_probe" "probe_api_int_6443" {
     # protocol            = "Tcp"
     port                = 6443
     request_path        = "/readyz"
-    interval_in_seconds = 5
-    number_of_probes    = 2
+    interval_in_seconds = 20
+    number_of_probes    = 6
 }
 
 resource "azurerm_lb_rule" "rule_api_int_6443" {
