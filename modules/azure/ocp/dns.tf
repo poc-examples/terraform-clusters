@@ -1,11 +1,11 @@
-resource "azurerm_dns_zone" "zone" {
-    name                = "objectworksit.com"
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    tags                = var.tags
-}
+# resource "azurerm_dns_zone" "zone" {
+#     name                = "objectworksit.com"
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     tags                = var.tags
+# }
 
 resource "azurerm_private_dns_zone" "base" {
-    name                = "objectworksit.com"
+    name                = "${var.cluster_name}.objectworksit.com"
     resource_group_name = data.azurerm_resource_group.cluster.name
     tags                = var.tags
 }
@@ -19,7 +19,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "base_link" {
 }
 
 resource "azurerm_private_dns_a_record" "api_int" {
-    name                = "api-int.${var.cluster_name}"
+    name                = "api-int"
     zone_name           = azurerm_private_dns_zone.base.name
     resource_group_name = data.azurerm_resource_group.cluster.name
     ttl                 = 60
@@ -28,7 +28,7 @@ resource "azurerm_private_dns_a_record" "api_int" {
 }
 
 resource "azurerm_private_dns_a_record" "api" {
-    name                = "api.${var.cluster_name}"
+    name                = "api"
     zone_name           = azurerm_private_dns_zone.base.name
     resource_group_name = data.azurerm_resource_group.cluster.name
     ttl                 = 60
@@ -37,7 +37,7 @@ resource "azurerm_private_dns_a_record" "api" {
 }
 
 resource "azurerm_private_dns_a_record" "apps" {
-    name                = "*.apps.${var.cluster_name}"
+    name                = "*.apps"
     zone_name           = azurerm_private_dns_zone.base.name
     resource_group_name = data.azurerm_resource_group.cluster.name
     ttl                 = 60
