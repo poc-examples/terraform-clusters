@@ -36,7 +36,7 @@ resource "azurerm_private_dns_a_record" "api" {
     tags                = var.tags
 }
 
-resource "azurerm_private_dns_a_record" "api" {
+resource "azurerm_private_dns_a_record" "apps" {
     name                = "*.apps.${var.cluster_name}"
     zone_name           = azurerm_private_dns_zone.base.name
     resource_group_name = data.azurerm_resource_group.cluster.name
