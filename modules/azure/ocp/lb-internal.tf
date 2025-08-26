@@ -1,5 +1,9 @@
+###################
+# Internal LoadBalancer for https://api-int.<clustername>.<domain>.com
+# Ports 6443 & 22623
+###################
 resource "azurerm_lb" "lb_api_internal" {
-    name                = "${var.cluster_name}-lb-api-internal"
+    name                = "${var.cluster_name}-internal"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
@@ -21,10 +25,10 @@ resource "azurerm_lb_backend_address_pool" "lbp_api_internal" {
 resource "azurerm_lb_probe" "probe_mcs_22623" {
     name                = "https-22623"
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
-    # protocol            = "Https"
-    protocol            = "Tcp"
+    protocol            = "Https"
+    # protocol            = "Tcp"
     port                = 22623
-    # request_path        = "/healthz"
+    request_path        = "/healthz"
     interval_in_seconds = 5
     number_of_probes    = 2
 }
@@ -32,10 +36,10 @@ resource "azurerm_lb_probe" "probe_mcs_22623" {
 resource "azurerm_lb_probe" "probe_api_int_6443" {
     name                = "https-6443"
     loadbalancer_id     = azurerm_lb.lb_api_internal.id
-    # protocol            = "Https"
-    protocol            = "Tcp"
+    protocol            = "Https"
+    # protocol            = "Tcp"
     port                = 6443
-    # request_path        = "/readyz"
+    request_path        = "/readyz"
     interval_in_seconds = 5
     number_of_probes    = 2
 }
