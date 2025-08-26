@@ -10,9 +10,9 @@ locals {
     ssh_pubkey = file("/usr/src/app/terraform/id_rsa.pub")
 
     masters = [
-        # { name = "master-0", ip = "10.0.1.6" },
-        # { name = "master-1", ip = "10.0.1.7" },
-        # { name = "master-2", ip = "10.0.1.8" },
+        { name = "master-0", ip = "10.0.1.6" },
+        { name = "master-1", ip = "10.0.1.7" },
+        { name = "master-2", ip = "10.0.1.8" },
     ]
 
     workers = [
