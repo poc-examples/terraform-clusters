@@ -18,9 +18,9 @@ locals {
     ]
 
     workers = [
-        # { name = "worker-0", ip = "10.0.2.5" },
-        # { name = "worker-1", ip = "10.0.2.6" },
-        # { name = "worker-2", ip = "10.0.2.7" },
+        { name = "worker-0", ip = "10.0.2.5" },
+        { name = "worker-1", ip = "10.0.2.6" },
+        { name = "worker-2", ip = "10.0.2.7" },
     ]
 
     bootstrap = {
