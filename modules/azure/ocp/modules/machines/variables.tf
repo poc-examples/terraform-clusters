@@ -68,8 +68,3 @@ variable "ignition_base_url" {
   type        = string
   description = "Base Ignition url for the machine"   
 }
-
-variable "ignition_base_url" {
-  type        = string
-  description = "Base Ignition url for the machine"   
-}
