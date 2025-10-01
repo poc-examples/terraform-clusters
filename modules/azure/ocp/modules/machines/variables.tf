@@ -59,11 +59,6 @@ variable "storage_account_container" {
   description = "Storage Container Name for Ignition"   
 }
 
-variable "ignition_type" {
-  type        = string
-  description = "Ignition Type for the machine"   
-}
-
 variable "ignition_base_url" {
   type        = string
   description = "Base Ignition url for the machine"   
