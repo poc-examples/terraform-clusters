@@ -10,6 +10,7 @@ locals {
     ssh_pubkey = file("/usr/src/app/terraform/id_rsa.pub")
 
     api_int_lb_ip   = "10.0.1.5"
+    ingress_lb_ip   = ""
 
     masters = [
         { name = "master-0", ip = "10.0.1.6" },
@@ -23,14 +24,13 @@ locals {
         { name = "worker-2", ip = "10.0.2.7" },
     ]
 
-    bootstrap = {
-        create  = true,
-        name    = "bootstrap-0", 
-        ip      = "10.0.0.5" 
-    }
+    bootstrap = [
+        { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
+    ]
 
     masters_by_name = { for m in local.masters : m.name => m }
     workers_by_name = { for w in local.workers : w.name => w }
+    bootstrap_by_name = { for b in local.bootstrap : b.name => b }
 }
 
 data "azurerm_resource_group" "cluster" {
@@ -38,9 +38,9 @@ data "azurerm_resource_group" "cluster" {
 }
 
 resource "azurerm_marketplace_agreement" "rhcos" {
-    publisher = "redhat"
-    offer     = "rh-ocp-worker"
-    plan      = "rh-ocp-worker"
+    publisher = local.rhcos_publisher
+    offer     = local.rhcos_offer
+    plan      = local.rhcos_sku
 }
 
 resource "azurerm_virtual_network" "network" {

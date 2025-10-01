@@ -52,3 +52,8 @@ resource "azurerm_subnet_network_security_group_association" "worker_subnet" {
     subnet_id                 = azurerm_subnet.worker_subnet.id
     network_security_group_id = azurerm_network_security_group.worker_subnet.id
 }
+
+resource "azurerm_subnet_nat_gateway_association" "workers_nat" {
+    subnet_id      = azurerm_subnet.worker_subnet.id
+    nat_gateway_id = azurerm_nat_gateway.nat_egress.id
+}
