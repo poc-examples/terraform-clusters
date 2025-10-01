@@ -21,7 +21,7 @@ module "workers" {
     storage_account             = azurerm_storage_account.ign.name
     storage_account_container   = azurerm_storage_container.ign.name
 
-    ignition_base_url           = local.master_url
+    ignition_base_url           = local.worker_url
 
     azurerm_storage_account_primary_connection_string   = azurerm_storage_account.ign.primary_connection_string
 }
