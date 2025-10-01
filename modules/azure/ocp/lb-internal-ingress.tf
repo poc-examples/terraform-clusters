@@ -3,7 +3,7 @@
 # Ports 443 & 80
 ###################
 resource "azurerm_lb" "lb_ingress_internal" {
-    name                = "${var.cluster_name}-7lcgz-internal"
+    name                = "${var.cluster_name}-ingress-internal"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
@@ -13,7 +13,7 @@ resource "azurerm_lb" "lb_ingress_internal" {
         name                          = "ingress"
         subnet_id                     = azurerm_subnet.worker_subnet.id
         private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.2.4"
+        private_ip_address            = "10.0.2.8"
     }
 }
 
