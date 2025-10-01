@@ -3,7 +3,7 @@
 # Ports 443 & 80
 ###################
 resource "azurerm_lb" "lb_ingress_internal" {
-    name                = "${var.cluster_name}-ingress"
+    name                = "${var.cluster_name}-7lcgz-internal"
     location            = data.azurerm_resource_group.cluster.location
     resource_group_name = data.azurerm_resource_group.cluster.name
     sku                 = "Standard"
