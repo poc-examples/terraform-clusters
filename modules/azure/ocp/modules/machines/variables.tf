@@ -68,3 +68,8 @@ variable "ignition_base_url" {
   type        = string
   description = "Base Ignition url for the machine"   
 }
+
+variable "disk_size_gb" {
+  type        = string
+  description = "The base storage size for machine"   
+}
