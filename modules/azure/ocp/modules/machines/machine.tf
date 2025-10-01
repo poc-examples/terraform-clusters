@@ -15,7 +15,7 @@ locals {
     }))
 }
 
-resource "azurerm_network_interface" "bootstrap" {
+resource "azurerm_network_interface" "machine" {
     name                = "${var.cluster_name}-${var.machine_name}-nic"
     location            = var.location
     resource_group_name = var.resource_group_name
@@ -28,13 +28,13 @@ resource "azurerm_network_interface" "bootstrap" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "bootstrap" {
+resource "azurerm_linux_virtual_machine" "machine" {
     name                = "${var.cluster_name}-${var.machine_name}-vm"
     location            = var.location
     resource_group_name = var.resource_group_name
     size                = "Standard_D8s_v3"
     admin_username      = "core"
-    network_interface_ids = [azurerm_network_interface.bootstrap.id]
+    network_interface_ids = [azurerm_network_interface.machine.id]
 
     source_image_reference {
         publisher = local.rhcos_publisher
@@ -64,8 +64,8 @@ resource "azurerm_linux_virtual_machine" "bootstrap" {
     }
 }
 
-resource "azurerm_network_interface_backend_address_pool_association" "bootstrap_api_internal" {
-    network_interface_id    = azurerm_network_interface.bootstrap.id
+resource "azurerm_network_interface_backend_address_pool_association" "lb" {
+    network_interface_id    = azurerm_network_interface.machine.id
     ip_configuration_name   = "ipconfig1"
     backend_address_pool_id = var.backend_address_pool_id
 }
