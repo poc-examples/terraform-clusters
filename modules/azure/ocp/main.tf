@@ -25,7 +25,7 @@ locals {
     ]
 
     bootstrap = [
-#        { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
+        { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
     ]
 
     masters_by_name = { for m in local.masters : m.name => m }
