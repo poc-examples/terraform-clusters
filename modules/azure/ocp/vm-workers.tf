@@ -16,7 +16,7 @@ module "workers" {
     resource_group_name         = data.azurerm_resource_group.cluster.name
 
     subnet_id                   = azurerm_subnet.worker_subnet.id
-    backend_address_pool_id     = azurerm_lb_backend_address_pool.lbp_api_internal.id
+    backend_address_pool_id     = azurerm_lb_backend_address_pool.lb_ingress_internal.id
 
     storage_account             = azurerm_storage_account.ign.name
     storage_account_container   = azurerm_storage_container.ign.name
