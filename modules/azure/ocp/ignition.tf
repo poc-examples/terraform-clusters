@@ -26,6 +26,11 @@ resource "azurerm_storage_container" "ign" {
     container_access_type = "private"
 }
 
+resource "terraform_data" "ign_bootstrap" {
+    triggers_replace = [filesha256("/usr/src/app/terraform/bootstrap.ign")]
+    input            = filesha256("/usr/src/app/terraform/bootstrap.ign")
+}
+
 resource "azurerm_storage_blob" "ign_bootstrap" {
     name                   = "bootstrap.ign"
     storage_account_name   = azurerm_storage_account.ign.name
@@ -35,8 +40,13 @@ resource "azurerm_storage_blob" "ign_bootstrap" {
     source                 = "/usr/src/app/terraform/bootstrap.ign"
 
     lifecycle {
-        replace_triggered_by = [ filesha256("/usr/src/app/terraform/bootstrap.ign") ]
+        replace_triggered_by = [ terraform_data.ign_bootstrap ]
     }
+}
+
+resource "terraform_data" "ign_master" {
+    triggers_replace = [filesha256("/usr/src/app/terraform/master.ign")]
+    input            = filesha256("/usr/src/app/terraform/master.ign")
 }
 
 resource "azurerm_storage_blob" "ign_master" {
@@ -48,8 +58,13 @@ resource "azurerm_storage_blob" "ign_master" {
     source                 = "/usr/src/app/terraform/master.ign"
 
     lifecycle {
-        replace_triggered_by = [ filesha256("/usr/src/app/terraform/master.ign") ]
+        replace_triggered_by = [ terraform_data.ign_master ]
     }
+}
+
+resource "terraform_data" "ign_worker" {
+    triggers_replace = [filesha256("/usr/src/app/terraform/worker.ign")]
+    input            = filesha256("/usr/src/app/terraform/worker.ign")
 }
 
 resource "azurerm_storage_blob" "ign_worker" {
@@ -61,6 +76,6 @@ resource "azurerm_storage_blob" "ign_worker" {
     source                 = "/usr/src/app/terraform/worker.ign"
 
     lifecycle {
-        replace_triggered_by = [ filesha256("/usr/src/app/terraform/worker.ign") ]
+        replace_triggered_by = [ terraform_data.ign_worker ]
     }
 }
