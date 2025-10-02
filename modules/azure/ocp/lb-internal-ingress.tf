@@ -75,4 +75,11 @@ resource "azurerm_network_security_group" "loadbalancer_nsg" {
     resource_group_name = data.azurerm_resource_group.cluster.name
     tags                = var.tags
 
+    lifecycle {
+        ignore_changes = [
+            tags,
+            security_rule,
+        ]
+    }
+
 }

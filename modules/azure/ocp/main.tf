@@ -14,9 +14,9 @@ locals {
     ingress_lb_ip   = "10.0.2.8"
 
     masters = [
-    #    { name = "master-0", ip = "10.0.1.6" },
-    #    { name = "master-1", ip = "10.0.1.7" },
-    #    { name = "master-2", ip = "10.0.1.8" },
+       { name = "master-0", ip = "10.0.1.6" },
+       { name = "master-1", ip = "10.0.1.7" },
+       { name = "master-2", ip = "10.0.1.8" },
     ]
 
     workers = [
