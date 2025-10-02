@@ -32,7 +32,7 @@ resource "azurerm_storage_blob" "ign_bootstrap" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/bootstrap.ign"
+    source_content         = file("/usr/src/app/terraform/bootstrap.ign")
 }
 
 resource "azurerm_storage_blob" "ign_master" {
@@ -41,7 +41,7 @@ resource "azurerm_storage_blob" "ign_master" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/master.ign"
+    source_content         = file("/usr/src/app/terraform/master.ign")
 }
 
 resource "azurerm_storage_blob" "ign_worker" {
@@ -50,5 +50,5 @@ resource "azurerm_storage_blob" "ign_worker" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/worker.ign"
+    source_content         = file("/usr/src/app/terraform/worker.ign")
 }
