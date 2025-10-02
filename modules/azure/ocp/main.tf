@@ -7,10 +7,11 @@ locals {
     rhcos_sku       = "rh-ocp-worker"
     rhcos_version   = "4.17.2024100419"
 
-    ssh_pubkey = file("/usr/src/app/terraform/id_rsa.pub")
+    ssh_pubkey  = file("/usr/src/app/terraform/id_rsa.pub")
+    metadata    = jsondecode(file("/usr/src/app/terraform/ignition/metadata.json"))
 
     api_int_lb_ip   = "10.0.1.5"
-    ingress_lb_ip   = ""
+    ingress_lb_ip   = "10.0.2.8"
 
     masters = [
     #    { name = "master-0", ip = "10.0.1.6" },
@@ -25,7 +26,7 @@ locals {
     ]
 
     bootstrap = [
-        # { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
+        { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
     ]
 
     masters_by_name = { for m in local.masters : m.name => m }

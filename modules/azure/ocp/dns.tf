@@ -41,7 +41,7 @@ resource "azurerm_private_dns_a_record" "apps" {
     zone_name           = azurerm_private_dns_zone.base.name
     resource_group_name = data.azurerm_resource_group.cluster.name
     ttl                 = 60
-    records             = ["10.0.2.8"]
+    records             = [local.ingress_lb_ip]
     tags                = var.tags
 }
 

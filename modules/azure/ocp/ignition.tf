@@ -27,8 +27,8 @@ resource "azurerm_storage_container" "ign" {
 }
 
 resource "terraform_data" "ign_bootstrap" {
-    triggers_replace = [filesha256("/usr/src/app/terraform/bootstrap.ign")]
-    input            = filesha256("/usr/src/app/terraform/bootstrap.ign")
+    triggers_replace = [filesha256("/usr/src/app/terraform/ignition/bootstrap.ign")]
+    input            = filesha256("/usr/src/app/terraform/ignition/bootstrap.ign")
 }
 
 resource "azurerm_storage_blob" "ign_bootstrap" {
@@ -37,7 +37,7 @@ resource "azurerm_storage_blob" "ign_bootstrap" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/bootstrap.ign"
+    source                 = "/usr/src/app/terraform/ignition/bootstrap.ign"
 
     lifecycle {
         replace_triggered_by = [ terraform_data.ign_bootstrap ]
@@ -45,8 +45,8 @@ resource "azurerm_storage_blob" "ign_bootstrap" {
 }
 
 resource "terraform_data" "ign_master" {
-    triggers_replace = [filesha256("/usr/src/app/terraform/master.ign")]
-    input            = filesha256("/usr/src/app/terraform/master.ign")
+    triggers_replace = [filesha256("/usr/src/app/terraform/ignition/master.ign")]
+    input            = filesha256("/usr/src/app/terraform/ignition/master.ign")
 }
 
 resource "azurerm_storage_blob" "ign_master" {
@@ -55,7 +55,7 @@ resource "azurerm_storage_blob" "ign_master" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/master.ign"
+    source                 = "/usr/src/app/terraform/ignition/master.ign"
 
     lifecycle {
         replace_triggered_by = [ terraform_data.ign_master ]
@@ -63,8 +63,8 @@ resource "azurerm_storage_blob" "ign_master" {
 }
 
 resource "terraform_data" "ign_worker" {
-    triggers_replace = [filesha256("/usr/src/app/terraform/worker.ign")]
-    input            = filesha256("/usr/src/app/terraform/worker.ign")
+    triggers_replace = [filesha256("/usr/src/app/terraform/ignition/worker.ign")]
+    input            = filesha256("/usr/src/app/terraform/ignition/worker.ign")
 }
 
 resource "azurerm_storage_blob" "ign_worker" {
@@ -73,7 +73,7 @@ resource "azurerm_storage_blob" "ign_worker" {
     storage_container_name = azurerm_storage_container.ign.name
     type                   = "Block"
     content_type           = "application/json"
-    source                 = "/usr/src/app/terraform/worker.ign"
+    source                 = "/usr/src/app/terraform/ignition/worker.ign"
 
     lifecycle {
         replace_triggered_by = [ terraform_data.ign_worker ]

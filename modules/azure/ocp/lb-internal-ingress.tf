@@ -2,20 +2,20 @@
 # Internal LoadBalancer for https://*.apps.<clustername>.<domain>.com
 # Ports 443 & 80
 ###################
-resource "azurerm_lb" "lb_ingress_internal" {
-    name                = "${var.cluster_name}-ingress-internal"
-    location            = data.azurerm_resource_group.cluster.location
-    resource_group_name = data.azurerm_resource_group.cluster.name
-    sku                 = "Standard"
-    tags                = var.tags
+# resource "azurerm_lb" "lb_ingress_internal" {
+#     name                = "${var.cluster_name}-ingress-internal"
+#     location            = data.azurerm_resource_group.cluster.location
+#     resource_group_name = data.azurerm_resource_group.cluster.name
+#     sku                 = "Standard"
+#     tags                = var.tags
 
-    frontend_ip_configuration {
-        name                          = "ingress"
-        subnet_id                     = azurerm_subnet.worker_subnet.id
-        private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.2.8"
-    }
-}
+#     frontend_ip_configuration {
+#         name                          = "ingress"
+#         subnet_id                     = azurerm_subnet.worker_subnet.id
+#         private_ip_address_allocation = "Static"
+#         private_ip_address            = local.ingress_lb_ip
+#     }
+# }
 
 # resource "azurerm_lb_backend_address_pool" "lb_ingress_internal" {
 #     name            = "ingress"
@@ -67,3 +67,12 @@ resource "azurerm_lb" "lb_ingress_internal" {
 #     probe_id                       = azurerm_lb_probe.probe_ingress_80.id
 #     enable_floating_ip             = false
 # }
+
+resource "azurerm_network_security_group" "worker_subnet" {
+    name                = "${local.metadata.infraID}-nsg"
+
+    location            = data.azurerm_resource_group.cluster.location
+    resource_group_name = data.azurerm_resource_group.cluster.name
+    tags                = var.tags
+
+}
