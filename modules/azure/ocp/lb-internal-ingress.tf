@@ -68,7 +68,7 @@
 #     enable_floating_ip             = false
 # }
 
-resource "azurerm_network_security_group" "worker_subnet" {
+resource "azurerm_network_security_group" "loadbalancer_nsg" {
     name                = "${local.metadata.infraID}-nsg"
 
     location            = data.azurerm_resource_group.cluster.location
