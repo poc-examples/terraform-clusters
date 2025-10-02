@@ -13,19 +13,19 @@ locals {
     ingress_lb_ip   = ""
 
     masters = [
-       { name = "master-0", ip = "10.0.1.6" },
-       { name = "master-1", ip = "10.0.1.7" },
-       { name = "master-2", ip = "10.0.1.8" },
+    #    { name = "master-0", ip = "10.0.1.6" },
+    #    { name = "master-1", ip = "10.0.1.7" },
+    #    { name = "master-2", ip = "10.0.1.8" },
     ]
 
     workers = [
-       { name = "worker-0", ip = "10.0.2.5" },
-       { name = "worker-1", ip = "10.0.2.6" },
-       { name = "worker-2", ip = "10.0.2.7" },
+    #    { name = "worker-0", ip = "10.0.2.5" },
+    #    { name = "worker-1", ip = "10.0.2.6" },
+    #    { name = "worker-2", ip = "10.0.2.7" },
     ]
 
     bootstrap = [
-        { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
+        # { create = true, name = "bootstrap-0", ip = "10.0.0.5" }
     ]
 
     masters_by_name = { for m in local.masters : m.name => m }

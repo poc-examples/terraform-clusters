@@ -17,53 +17,53 @@ resource "azurerm_lb" "lb_ingress_internal" {
     }
 }
 
-resource "azurerm_lb_backend_address_pool" "lb_ingress_internal" {
-    name            = "ingress"
-    loadbalancer_id = azurerm_lb.lb_ingress_internal.id
-}
+# resource "azurerm_lb_backend_address_pool" "lb_ingress_internal" {
+#     name            = "ingress"
+#     loadbalancer_id = azurerm_lb.lb_ingress_internal.id
+# }
 
-resource "azurerm_lb_probe" "probe_ingress_80" {
-    name                = "http-80"
-    loadbalancer_id     = azurerm_lb.lb_ingress_internal.id
-    protocol            = "Http"
-    # protocol            = "Tcp"
-    port                = 80
-    request_path        = "/healthz"
-    interval_in_seconds = 5
-    number_of_probes    = 2
-}
+# resource "azurerm_lb_probe" "probe_ingress_80" {
+#     name                = "http-80"
+#     loadbalancer_id     = azurerm_lb.lb_ingress_internal.id
+#     protocol            = "Http"
+#     # protocol            = "Tcp"
+#     port                = 80
+#     request_path        = "/healthz"
+#     interval_in_seconds = 5
+#     number_of_probes    = 2
+# }
 
-resource "azurerm_lb_probe" "probe_ingress_443" {
-    name                = "https-443"
-    loadbalancer_id     = azurerm_lb.lb_ingress_internal.id
-    protocol            = "Https"
-    # protocol            = "Tcp"
-    port                = 443
-    request_path        = "/readyz"
-    interval_in_seconds = 5
-    number_of_probes    = 2
-}
+# resource "azurerm_lb_probe" "probe_ingress_443" {
+#     name                = "https-443"
+#     loadbalancer_id     = azurerm_lb.lb_ingress_internal.id
+#     protocol            = "Https"
+#     # protocol            = "Tcp"
+#     port                = 443
+#     request_path        = "/healthz"
+#     interval_in_seconds = 5
+#     number_of_probes    = 2
+# }
 
-resource "azurerm_lb_rule" "rule_ingress_443" {
-    name                           = "ingress-443"
-    loadbalancer_id                = azurerm_lb.lb_ingress_internal.id
-    protocol                       = "Tcp"
-    frontend_port                  = 443
-    backend_port                   = 443
-    frontend_ip_configuration_name = "ingress"
-    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_ingress_internal.id]
-    probe_id                       = azurerm_lb_probe.probe_ingress_443.id
-    enable_floating_ip             = false
-}
+# resource "azurerm_lb_rule" "rule_ingress_443" {
+#     name                           = "ingress-443"
+#     loadbalancer_id                = azurerm_lb.lb_ingress_internal.id
+#     protocol                       = "Tcp"
+#     frontend_port                  = 443
+#     backend_port                   = 443
+#     frontend_ip_configuration_name = "ingress"
+#     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_ingress_internal.id]
+#     probe_id                       = azurerm_lb_probe.probe_ingress_443.id
+#     enable_floating_ip             = false
+# }
 
-resource "azurerm_lb_rule" "rule_ingress_80" {
-    name                           = "ingress-80"
-    loadbalancer_id                = azurerm_lb.lb_ingress_internal.id
-    protocol                       = "Tcp"
-    frontend_port                  = 80
-    backend_port                   = 80
-    frontend_ip_configuration_name = "ingress"
-    backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_ingress_internal.id]
-    probe_id                       = azurerm_lb_probe.probe_ingress_80.id
-    enable_floating_ip             = false
-}
+# resource "azurerm_lb_rule" "rule_ingress_80" {
+#     name                           = "ingress-80"
+#     loadbalancer_id                = azurerm_lb.lb_ingress_internal.id
+#     protocol                       = "Tcp"
+#     frontend_port                  = 80
+#     backend_port                   = 80
+#     frontend_ip_configuration_name = "ingress"
+#     backend_address_pool_ids       = [azurerm_lb_backend_address_pool.lb_ingress_internal.id]
+#     probe_id                       = azurerm_lb_probe.probe_ingress_80.id
+#     enable_floating_ip             = false
+# }

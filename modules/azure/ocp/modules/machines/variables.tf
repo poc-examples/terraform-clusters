@@ -68,3 +68,9 @@ variable "disk_size_gb" {
   type        = string
   description = "The base storage size for machine"   
 }
+
+variable "create_association" {
+  type    = bool
+  default = true
+  description = "Attach to LoadBalancer"   
+}
